@@ -9,8 +9,7 @@
   },
   "permissions": [
     "tabs",
-    "https://*@api.pinboard.in/",
-    "https://api.pinboard.in/"
+    "https://*.pinboard.in/"
   ],
   "background_page": "background.html",
   "icons": {
