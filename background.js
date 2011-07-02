@@ -13,35 +13,6 @@ var getMainPath = function () {
 // {url, title, desc, tag, time, isSaved}
 var pages = {};
 
-var login = function (name, pwd) {
-    // test auth
-    var path = 'https://' + pathBody + 'posts/update';
-    var jqxhr = $.ajax({url: path,
-                        type : 'GET',
-                        dataType: 'json',
-                        crossDomain: true,
-                        contentType:'text/plain'});
-    jqxhr.complete(function (data) {
-                       var res = $(data.responseXML).find('update'),
-                       resTime = res.attr('time');
-                       if (resTime) {
-                           _userInfo.name = name;
-                           _userInfo.pwd = pwd;
-                           _userInfo.isChecked = true;
-                           localStorage[namekey] = name;
-                           localStorage[pwdkey] = pwd;
-                           localStorage[checkedkey] = true;
-                           chrome.tabs.getSelected(
-                               null, function (tab) {
-                                   updatePageInfo(tab.url);
-                               });
-                       } else {
-                           // error
-                           
-                       }
-                   });
-};
-
 var logout = function () {
     _userInfo.isChecked = false;
     localStorage.removeItem(checkedkey);
@@ -92,7 +63,36 @@ var updatePageInfo = function (url) {
         updateSelectedTabExtIcon();
     };
     queryPinState({url: url, ready: cb});
-}
+};
+
+var login = function (name, pwd) {
+    // test auth
+    var path = 'https://' + name + ':' + pwd + at + pathBody + 'posts/update';
+    var jqxhr = $.ajax({url: path,
+                        type : 'GET',
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'});
+    jqxhr.complete(function (data) {
+                       var res = $(data.responseXML).find('update'),
+                       resTime = res.attr('time');
+                       if (resTime) {
+                           _userInfo.name = name;
+                           _userInfo.pwd = pwd;
+                           _userInfo.isChecked = true;
+                           localStorage[namekey] = name;
+                           localStorage[pwdkey] = pwd;
+                           localStorage[checkedkey] = true;
+                           chrome.tabs.getSelected(
+                               null, function (tab) {
+                                   updatePageInfo(tab.url);
+                               });
+                       } else {
+                           // error
+                           
+                       }
+                   });
+};
 
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
