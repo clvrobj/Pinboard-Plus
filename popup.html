@@ -1,0 +1,154 @@
+<head>
+  <style>
+    body {
+    width: 480px;
+    height: 300px;
+    color: #333;
+    font-family: helvetica;
+    font-size: 12px;
+    }
+    ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    }
+    ul li {
+    margin: 0 0 10px 50px;
+    }
+    ul .item-title {
+    text-align: right;
+    width: 3.2em;
+    display: inline-block;
+    margin: 5px 0 0 -46px;
+    display: block;
+    text-align: right;
+    position: absolute;
+    }
+    #suggest {
+    display: inline-block;
+    margin: 5px 0 0 5px;
+    }
+    #suggest a {
+    margin: 0 3px;
+    }
+    #state-mask {
+    display: none;
+    position: absolute;
+    width: 100%;
+    margin-top: 25px;
+    height: 270px;
+    background-color: #FFF;
+    opacity: 0.7;
+    z-index: 20;
+    }
+    #login-window {
+    display: none;
+    position: absolute;
+    width: 100%;
+    margin-top: 25px;
+    height: 240px;
+    padding: 20px 0;
+    background-color: #FFF;
+    z-index: 10;
+    }
+    #header {
+    height: 25px;
+    color: #AAA;
+    }
+    #header .logout {
+    float: right;
+    }
+    #header .logo {
+    float: left;
+    padding-top: 2px;
+    }
+    .logo-unlogin {
+    float: left;
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    background-color: #FFF;
+    }
+    .alert {
+    display: none;
+    margin-left: 20px;
+    color: #333;
+    background: #CED;
+    float: left;
+    padding: 3px;
+    padding-top: 1px;
+    width: 300px;
+    border: 1px solid #ACC;
+    }
+    a {
+    text-decoration: none;
+    color: #11A;
+    }
+    #delete {
+    display: none;
+    }
+  </style>
+  <script type="text/javascript" src="jquery-1.6.1.min.js"></script>
+  <script type="text/javascript" src="popup.js"></script>
+</head>
+<body>
+  <div id="state-mask">Loading...</div>
+  <ul id="login-window">
+    <li>
+      <span style="width: 60px;display: inline-block;">username:</span>
+      <input id="username" type="text" size="20" />
+    </li>
+    <li>
+      <span style="width: 60px;display: inline-block;">password:</span>
+      <input id="password" type="password" size="20" />
+    </li>
+    <li>
+      <input id="login" type="submit" value="log in" style="margin-left: 60px" />
+    </li>
+  </ul>
+  <div id="header">
+    <div class="logout">[<a href="#">log out</a>]</div>
+    <div class="logo">Pinboard - (<a id="user" href="#"></a>)</div>
+    <div class="logo-unlogin">Pinboard - please login</div>
+    <div class="alert"></div>
+  </div>
+  <ul>    
+    <li>
+      <label class="item-title">URL</label>
+      <input id="url" type="text" size="70" />
+    </li>
+    <li>
+      <label class="item-title">Title</label>
+      <input id="title" type="text" size="70" />
+    </li>
+    <li>
+      <label class="item-title">Notes</label>
+      <textarea id="desc" cols="50" rows="4"></textarea>
+    </li>
+    <li>
+      <label class="item-title">Tags</label>
+      <input id="tag" type="text" size="70" />
+    </li>
+    <li>
+      <label class="item-title">Suggest</label>
+      <span id="suggest"></span>
+    </li>
+    <li>
+      <input type="checkbox" name="private" id="private"> <label style="display:inline" for="private">private</label> 
+      <input type="checkbox" name="toread" id="toread"> <label style="display:inline" for="toread">read later</label>
+    </li>
+    <li>
+      <input id="submit" type="submit" value="Submit" />
+      &nbsp;&nbsp;&nbsp;
+      <span>
+        <a id="delete" href="#" style="text-decoration: none;color: #11A">delete</a>
+        <span class="confirm" style="display: none; ">
+          <a id="cancel-delete" href="#" >cancel</a>
+          &nbsp;/&nbsp;
+          <a id="destroy" href="#" style="color:red" >destroy</a> 
+        </span>
+      </span>
+    </li>
+  <ul>
+</body>

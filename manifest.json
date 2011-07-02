@@ -1,0 +1,21 @@
+{
+  "name": "Pinboard Plus",
+  "version": "1.0.1",
+  "description": "A better chrome extension for Pinboard (http://pinboard.in).",
+  "browser_action": {
+     "default_icon": "icon_grey_19.png",
+     "popup": "popup.html",
+     "icons": ["icon_grey_19.png", "icon_black_19.png"]
+  },
+  "permissions": [
+    "tabs",
+    "https://*@api.pinboard.in/",
+    "https://api.pinboard.in/"
+  ],
+  "background_page": "background.html",
+  "icons": {
+    "16": "appicon_16.png",
+    "48": "appicon_48.png",
+    "128": "appicon_128.png"
+  }
+}
