@@ -1,6 +1,6 @@
 {
   "name": "Pinboard Plus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A better chrome extension for Pinboard (http://pinboard.in).",
   "browser_action": {
      "default_icon": "icon_grey_19.png",
