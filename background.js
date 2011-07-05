@@ -88,8 +88,7 @@ var login = function (name, pwd) {
                                    updatePageInfo(tab.url);
                                });
                        } else {
-                           // error
-                           
+                           // error                           
                        }
                    });
 };
@@ -98,14 +97,12 @@ var queryPinState = function (info) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && info.url) {
         var url = info.url;
-        console.log('queryPinState -- ' + url);
         var xhr = new XMLHttpRequest();
         xhr.open("GET", getMainPath() + 'posts/get?url=' + url, true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 var post = xhr.responseXML.documentElement.getElementsByTagName("post"), pageInfo;
-                if (post.length > 0) {
-                    
+                if (post.length > 0) {                    
                     var attrs = post[0].attributes;
                     pageInfo = {url: attrs.getAttrVal("href"), 
                                 title: attrs.getAttrVal("description"),
@@ -129,13 +126,9 @@ var queryPinState = function (info) {
 var updateSelectedTabExtIcon = function () {
     chrome.tabs.getSelected(null, function (tab) {
                                 var pageInfo = pages[tab.url];
-                                console.log('updateSelectedTabExtIcon');
-                                console.log(pageInfo);
-                                var iconPath;
+                                var iconPath = noIcon;
                                 if (pageInfo && pageInfo.isSaved) {
                                     iconPath = yesIcon;
-                                } else {
-                                    iconPath = noIcon;
                                 }
                                 chrome.browserAction.setIcon(
                                     {path: iconPath, tabId: tab.id});
@@ -145,7 +138,6 @@ var updateSelectedTabExtIcon = function () {
 var addPost = function (info) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && info.url && info.title) {
-        console.log('addPost');
         var path = getMainPath() + 'posts/add?',
         data = {description: info.title, url: info.url,
                 extended: info.desc, tags: info.tag};
@@ -169,11 +161,9 @@ var addPost = function (info) {
     }
 };
 
-
 var deletePost = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        console.log('deletePost');
         var path = getMainPath() + 'posts/delete?';
         var jqxhr = $.ajax({url: path,
                 type : 'GET',
@@ -197,7 +187,6 @@ var deletePost = function (url) {
 var getSuggest = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        console.log('getSuggest');
         var path = getMainPath() + 'posts/suggest?url=' + url,
         jqxhr = $.ajax({url: path,
                 type : 'GET',
@@ -219,7 +208,6 @@ var getSuggest = function (url) {
 chrome.tabs.onUpdated.addListener(
     function(id, changeInfo, tab) {
         if (changeInfo.url) {
-            console.log('tabs.onUpdate --' + ' url: ' + changeInfo.url);
             var url = changeInfo.url;
             if (!pages[url]) {                
                 chrome.browserAction.setIcon({path: noIcon, tabId: tab.id});

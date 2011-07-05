@@ -175,7 +175,6 @@ $(function () {
               tag && (info.tag = tag);
               $('#private').attr('checked') && (info.shared = 'no');
               $('#toread').attr('checked') && (info.toread = 'yes');
-              console.log(bg.addPost);
               bg.addPost(info);
           });
       $('#delete').click(function () {
