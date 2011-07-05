@@ -48,7 +48,7 @@ var renderPageInfo = function (pageInfo) {
                 dispStr = 'previously saved ',
                 w = passed.week, d = passed.day, h = passed.hour;
                 if (passed.offset > WEEK) {
-                    dispStr = dispStr.concat(passed.week, ' ', 'days ago');
+                    dispStr = dispStr.concat(passed.week, ' ', 'weeks ago');
                 } else if (passed.offset > DAY) {
                     dispStr = dispStr.concat(passed.day, ' ', 'days ago');
                 } else if (passed.offset > HOUR){
