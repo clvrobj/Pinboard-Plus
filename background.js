@@ -1,5 +1,5 @@
 // userInfo: name, pwd, isChecked
-var _userInfo = null, keyprefix = 'pbuinfo',
+var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
 namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
 at = '@', pathBody = 'api.pinboard.in/v1/',
 yesIcon = 'icon_black_19.png', noIcon = 'icon_grey_19.png';
@@ -76,7 +76,7 @@ var login = function (name, pwd) {
     jqxhr.complete(function (data) {
                        var res = $(data.responseXML).find('update'),
                        resTime = res.attr('time');
-                       if (resTime) {
+                       if (resTime) { // success
                            _userInfo.name = name;
                            _userInfo.pwd = pwd;
                            _userInfo.isChecked = true;
@@ -87,6 +87,7 @@ var login = function (name, pwd) {
                                null, function (tab) {
                                    updatePageInfo(tab.url);
                                });
+                           _getTags();
                        } else {
                            // error                           
                        }
@@ -201,6 +202,30 @@ var getSuggest = function (url) {
                            }
                            var popup = chrome.extension.getViews({type: 'popup'})[0];
                            popup.renderSuggests(suggests);
+                       });
+    }
+};
+
+var getTags = function () {
+    return _tags;
+};
+
+// acquire all user tags from server refresh _tags
+var _getTags = function () {
+    var userInfo = getUserInfo();
+    if (userInfo && userInfo.isChecked) {
+        var path = getMainPath() + 'tags/get',
+        jqxhr = $.ajax({url: path,
+                type : 'GET',
+                dataType: 'json',
+                crossDomain: true,
+                contentType:'text/plain'});
+        jqxhr.complete(function (data) {
+                           var res = $(data.responseXML).find('tag');
+                           _tags = [];
+                           for (var i=0, len = res.length; i<len; i++) {
+                               _tags.push(res[i].attributes.getAttrVal('tag'));
+                           }
                        });
     }
 };

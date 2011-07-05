@@ -1,4 +1,4 @@
-var bg = chrome.extension.getBackgroundPage(), curTabUrl = '';
+var bg = chrome.extension.getBackgroundPage(), curTabUrl = '', tags = [];
 
 var SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
 Date.prototype.getTimePassed = function () {
@@ -195,4 +195,36 @@ $(function () {
       $('.logout').click(function () {
                              bg.logout();
                          });
+
+      // auto complete
+      var pos = $('#tag').offset();
+      pos.top = pos.top + $('#tag').outerHeight();
+      $('.auto-complete').css({'left': pos.left, 'top': pos.top});
+      $('#tag').keyup(
+          function (e) {
+              var word = $(e.target).val(), match_inds = [];
+              if (!word || word == '') {
+                  $('.auto-complete').hide();
+                  return;
+              }
+              var lis = $('.auto-complete li'), showedCount = 0;
+              lis.addClass('exclude');
+              for (var i=0, len=tags.length; i<len && showedCount < 5; i++) {
+                  var tag = tags[i];
+                  if (tag.indexOf(word) == 0) {
+                      lis.eq(i).removeClass('exclude');
+                      showedCount = showedCount + 1;
+                  }
+              }
+              $('.auto-complete').show();
+          });
+
+      tags = bg.getTags();
+      if (tags.length) {
+          for (var i=0, len=tags.length; i<len; i++) {
+              var con = $('<li>'.concat(tags[i], '</li>'));
+              $('.auto-complete ul').append(con);
+          }
+      }
+      $('.auto-complete').hide();
   });

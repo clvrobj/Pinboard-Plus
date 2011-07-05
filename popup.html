@@ -14,6 +14,7 @@
     }
     ul li {
     margin: 0 0 10px 50px;
+    list-style-type: none;
     }
     ul .item-title {
     text-align: right;
@@ -88,6 +89,28 @@
     #delete {
     display: none;
     }
+    .auto-complete {
+    background-color: #FFF;
+    border: 1px solid #AAA;
+    box-shadow: 1px 1px 3px rgba(0, 0, 110, 0.33);
+    margin-left: 8px;
+    min-width: 200px;
+    position: absolute;
+    }
+    .auto-complete li {
+    background-color: #FFF;
+    border-bottom: 0 solid #FFF;
+    color: #2255AA;
+    margin: 0;
+    padding: 3px 5px;
+    }
+    .auto-complete .active {
+    background-color: #969696;
+    color: #FFF;
+    }
+    .auto-complete li.exclude {
+    display: none;
+    }
   </style>
   <script type="text/javascript" src="jquery-1.6.1.min.js"></script>
   <script type="text/javascript" src="popup.js"></script>
@@ -150,5 +173,6 @@
         </span>
       </span>
     </li>
-  <ul>
+  </ul>
+  <div class="auto-complete"><ul></ul></div>
 </body>
