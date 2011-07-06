@@ -229,6 +229,7 @@ var _getTags = function () {
                        });
     }
 };
+_getTags();
 
 chrome.tabs.onUpdated.addListener(
     function(id, changeInfo, tab) {

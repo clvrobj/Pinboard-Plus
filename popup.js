@@ -155,6 +155,90 @@ hideLoginWindow = function () {
     $('#login-window').hide();
 };
 
+var init_autocomplete_suggest = function (o) {
+    // auto complete
+    $(o).keyup(
+        function (e) {
+            // arrow / enter / tab key
+            var code = e.charCode? e.charCode : e.keyCode;
+            if (code) {
+                if (code == 13 || code == 9) {
+                    submitSuggestCon(suggestsBox.find('.active')[0]);
+                    return;
+                } else if (code == 38 || code == 40) {
+                    var lis = suggestsBox.find('li').not('.exclude'), len= lis.length,
+                    ind = lis.index(suggestsBox.find('.active'));
+                    if (code == 40) { // down
+                        ind += 1;
+                        if (ind >= len) ind = 0;
+                    } else {
+                        ind -= 1;
+                        if (ind < 0) ind = len;
+                    }
+                    activeSuggestConbyIndex(ind);
+                    return;
+                }
+            }
+            var items = $(e.target).val().split(' '), word = items[items.length - 1],
+            match_inds = [];
+            if (!word || word == '') {
+                suggestsBox.hide();
+                return;
+            }
+            var lis = suggestsBox.find('li'), shownCount = 0;
+            lis.addClass('exclude');
+            for (var i=0, len=tags.length; i<len && shownCount < 5; i++) {
+                var tag = tags[i];
+                if (tag.indexOf(word) == 0) {
+                    lis.eq(i).removeClass('exclude');
+                    shownCount += 1;
+                }
+            }
+            if (shownCount) {
+                suggestsBox.show();
+                activeSuggestConbyIndex(0);
+            }
+        });
+
+    $(o).keydown(function (e) {
+                     var code = e.charCode? e.charCode : e.keyCode;
+                     return !(code && (code == 13 || code == 9));
+                 });
+
+    var activeSuggestConbyIndex = function (index) {
+        suggestsBox.find('.active').removeClass('active');
+        suggestsBox.find('li').not('.exclude').eq(index).addClass('active');
+    },
+    submitSuggestCon = function (con) {
+        if (con) {
+            var items = $(o).val().split(' ');
+            items.splice(items.length - 1, 1, $(con).text());
+            $(o).val(items.join(' ') + ' ').focus();
+            suggestsBox.find('.active').removeClass('active');
+            suggestsBox.hide();
+        }
+    };
+
+    var suggestsBox = $('<div class="auto-complete"><ul></ul></div>');
+    tags = bg.getTags();
+    if (tags.length) {
+        for (var i=0, len=tags.length; i<len; i++) {
+            var con = $('<li>'.concat(tags[i], '</li>'));
+            con.click(function (e) {submitSuggestCon(e.target);});
+            con.mouseenter(function (e) {
+                               var ind = suggestsBox.find('li').not('.exclude').index(e.target);
+                               activeSuggestConbyIndex(ind);
+                           });
+            suggestsBox.children('ul').append(con);
+        }
+    }
+    $('body').append(suggestsBox);
+    var pos = $(o).offset();
+    pos.top = pos.top + $(o).outerHeight();
+    suggestsBox.css({'left': pos.left, 'top': pos.top});
+    suggestsBox.hide();    
+};
+
 $(function () {
       initPopup();
       if (checkLogin()) {
@@ -196,35 +280,5 @@ $(function () {
                              bg.logout();
                          });
 
-      // auto complete
-      var pos = $('#tag').offset();
-      pos.top = pos.top + $('#tag').outerHeight();
-      $('.auto-complete').css({'left': pos.left, 'top': pos.top});
-      $('#tag').keyup(
-          function (e) {
-              var word = $(e.target).val(), match_inds = [];
-              if (!word || word == '') {
-                  $('.auto-complete').hide();
-                  return;
-              }
-              var lis = $('.auto-complete li'), showedCount = 0;
-              lis.addClass('exclude');
-              for (var i=0, len=tags.length; i<len && showedCount < 5; i++) {
-                  var tag = tags[i];
-                  if (tag.indexOf(word) == 0) {
-                      lis.eq(i).removeClass('exclude');
-                      showedCount = showedCount + 1;
-                  }
-              }
-              $('.auto-complete').show();
-          });
-
-      tags = bg.getTags();
-      if (tags.length) {
-          for (var i=0, len=tags.length; i<len; i++) {
-              var con = $('<li>'.concat(tags[i], '</li>'));
-              $('.auto-complete ul').append(con);
-          }
-      }
-      $('.auto-complete').hide();
+      init_autocomplete_suggest($('#tag'));
   });
