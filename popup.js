@@ -63,6 +63,7 @@ var renderPageInfo = function (pageInfo) {
             initPopup();
         }
         $('#tag').focus();
+        resume_autocomplete_suggest();
     }
 };
 
@@ -155,9 +156,17 @@ hideLoginWindow = function () {
     $('#login-window').hide();
 };
 
+var stop_autocomplete_suggest = function (o) {
+    $('#tag').die('keyup keydown');
+},
+resume_autocomplete_suggest = function (o) {
+    $('#tag').live('keyup keydown');
+};
+
 var init_autocomplete_suggest = function (o) {
     // auto complete
-    $(o).keyup(
+    $(o).live(
+        'keyup',
         function (e) {
             // arrow / enter / tab key
             var code = e.charCode? e.charCode : e.keyCode;
@@ -200,10 +209,13 @@ var init_autocomplete_suggest = function (o) {
             }
         });
 
-    $(o).keydown(function (e) {
-                     var code = e.charCode? e.charCode : e.keyCode;
-                     return !(code && (code == 13 || code == 9));
-                 });
+    $(o).live('keydown', function (e) {
+                  var code = e.charCode? e.charCode : e.keyCode;
+                  if (code && code == 13 && suggestsBox.find('.active').length == 0) {
+                      return true;
+                  }
+                  return !(code && (code == 13 || code == 9));
+              });
 
     var activeSuggestConbyIndex = function (index) {
         suggestsBox.find('.active').removeClass('active');
@@ -247,8 +259,9 @@ $(function () {
                   getPageInfo(tab.url);
               });
       }
-      $('#submit').click(
+      $('#add-post-form').submit(
           function () {
+              stop_autocomplete_suggest();
               showLoading();
               var info = {},
               url = $('#url').val(), title = $('#title').val(),
@@ -260,6 +273,7 @@ $(function () {
               $('#private').attr('checked') && (info.shared = 'no');
               $('#toread').attr('checked') && (info.toread = 'yes');
               bg.addPost(info);
+              return false;
           });
       $('#delete').click(function () {
                              $(this).hide();
