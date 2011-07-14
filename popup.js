@@ -14,6 +14,12 @@ Date.prototype.getTimePassed = function () {
     return ret;
 };
 
+var loginFailed = function () {
+    hideLoading();
+    showLoginWindow();
+    $('#login-error').show();
+};
+
 var renderSuggests = function (suggests) {
     if (suggests && suggests.length) {
         var suggestsStr = '';
@@ -127,8 +133,10 @@ hideLoading = function () {
 };
 
 var showLoginWindow = function () {
+    hideLoading();
     $('.logo-unlogin').show();
     $('#login-window').show();
+    $('#login-error').hide();
     var submit = function () {
         showLoading();
         var name = $('#login-window #username').val(),
@@ -206,6 +214,9 @@ var init_autocomplete_suggest = function (o) {
             if (shownCount) {
                 suggestsBox.show();
                 activeSuggestConbyIndex(0);
+            } else {
+                suggestsBox.find('.active').removeClass('active');
+                suggestsBox.hide();
             }
         });
 

@@ -125,6 +125,7 @@
 <body>
   <div id="state-mask">Loading...</div>
   <ul id="login-window">
+    <li id="login-error" style="display:none;"><span style="color:red;">Login failed</span></li>
     <li>
       <span style="width: 60px;display: inline-block;">username:</span>
       <input id="username" type="text" size="20" />
@@ -144,7 +145,7 @@
     <div class="alert"></div>
   </div>
   <form id="add-post-form" action＝"#">
-    <ul>    
+    <ul>
       <li>
         <label class="item-title">URL</label>
         <input id="url" type="text" style="width:420px" />

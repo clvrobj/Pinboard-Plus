@@ -67,6 +67,7 @@ var updatePageInfo = function (url) {
 
 var login = function (name, pwd) {
     // test auth
+    pwd = encodeURIComponent(pwd);
     var path = 'https://' + name + ':' + pwd + at + pathBody + 'posts/update';
     var jqxhr = $.ajax({url: path,
                         type : 'GET',
@@ -89,7 +90,9 @@ var login = function (name, pwd) {
                                });
                            _getTags();
                        } else {
-                           // error                           
+                           // error
+                           var popup = chrome.extension.getViews({type: 'popup'})[0];
+                           popup.loginFailed();
                        }
                    });
 };
