@@ -14,6 +14,12 @@ Date.prototype.getTimePassed = function () {
     return ret;
 };
 
+var openUrl = function (url) {
+    chrome.tabs.create({url: url});
+    var popup = chrome.extension.getViews({type: 'popup'})[0];
+    popup && popup.close();
+};
+
 var loginFailed = function () {
     hideLoading();
     showLoginWindow();
@@ -96,37 +102,10 @@ var checkLogin = function () {
     }
 };
 
-var initPopup = function () {
-    var userInfo = checkLogin();
-    if (userInfo) {
-        $('#user').text(userInfo.name);
-        $('#user').unbind('click').click(
-            function () {
-                chrome.tabs.create(
-                    {url: 'https://pinboard.in/u:'+userInfo.name});
-                var popup = chrome.extension.getViews(
-                    {type: 'popup'})[0];
-                popup && popup.close();
-            });
-        chrome.tabs.getSelected(
-            null, function (tab) {
-                $('#url').val(tab.url);
-                $('#title').val(tab.title);
-                $('#desc').val('');
-                $('#tags').val('');
-                $('#private').attr('checked', false);
-                $('#toread').attr('checked', false);
-                $('.alert').hide();
-                $('#delete').hide();
-                $('.confirm').hide();
-                $('logo-unlogin').hide();
-                bg.getSuggest(tab.url);
-            });
-    }
-};
-
-var showLoading = function () {
-    $('#state-mask').show();
+var showLoading = function (content) {
+    var mask = $('#state-mask');
+    mask.html(content || 'Loading...');
+    mask.show();
 },
 hideLoading = function () {
     $('#state-mask').hide();
@@ -138,7 +117,7 @@ var showLoginWindow = function () {
     $('#login-window').show();
     $('#login-error').hide();
     var submit = function () {
-        showLoading();
+        showLoading('Logging in...');
         var name = $('#login-window #username').val(),
         pwd = $('#login-window #password').val();
         bg.login(name, pwd);
@@ -262,6 +241,28 @@ var init_autocomplete_suggest = function (o) {
     suggestsBox.hide();    
 };
 
+var initPopup = function () {
+    var userInfo = checkLogin();
+    if (userInfo) {
+        $('#user').text(userInfo.name);
+        $('#logo-link').unbind('click').click(function () {openUrl('https://pinboard.in/');});
+        chrome.tabs.getSelected(
+            null, function (tab) {
+                $('#url').val(tab.url);
+                $('#title').val(tab.title);
+                $('#desc').val('');
+                $('#tags').val('');
+                $('#private').attr('checked', false);
+                $('#toread').attr('checked', false);
+                $('.alert').hide();
+                $('#delete').hide();
+                $('.confirm').hide();
+                $('logo-unlogin').hide();
+                bg.getSuggest(tab.url);
+            });
+    }
+};
+
 $(function () {
       initPopup();
       if (checkLogin()) {
@@ -273,7 +274,7 @@ $(function () {
       $('#add-post-form').submit(
           function () {
               stop_autocomplete_suggest();
-              showLoading();
+              showLoading('Saving...');
               var info = {},
               url = $('#url').val(), title = $('#title').val(),
               desc = $('#desc').val(), tag = $('#tag').val();
@@ -295,7 +296,7 @@ $(function () {
                                     $('#delete').show();
                                 });
       $('#destroy').click(function () {
-                             showLoading();
+                             showLoading('Deleting...');
                              chrome.tabs.getSelected(
                                  null, function (tab) {
                                      bg.deletePost(tab.url);
@@ -304,6 +305,9 @@ $(function () {
       $('.logout').click(function () {
                              bg.logout();
                          });
+
+      $('.random').unbind('click').click(
+          function () {openUrl('https://pinboard.in/random/?type=unread');});
 
       init_autocomplete_suggest($('#tag'));
   });

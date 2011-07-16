@@ -57,8 +57,9 @@ var getPageInfo = function (url) {
 
 // refresh page info even page info has fetched from server
 var updatePageInfo = function (url) {
+    var popup = chrome.extension.getViews({type: 'popup'})[0];
+    popup.showLoading('Loading bookmark...');
     var cb = function (pageInfo) {
-        var popup = chrome.extension.getViews({type: 'popup'})[0];
         popup.renderPageInfo(pageInfo);
         updateSelectedTabExtIcon();
     };
@@ -67,6 +68,7 @@ var updatePageInfo = function (url) {
 
 var login = function (name, pwd) {
     // test auth
+    name = encodeURIComponent(name);
     pwd = encodeURIComponent(pwd);
     var path = 'https://' + name + ':' + pwd + at + pathBody + 'posts/update';
     var jqxhr = $.ajax({url: path,

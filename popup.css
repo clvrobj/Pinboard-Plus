@@ -1,0 +1,147 @@
+body {
+    width: 480px;
+    height: 300px;
+    color: #333;
+    font-family: helvetica;
+    font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    color: #11A;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul li {
+    margin: 0 0 10px 50px;
+    list-style-type: none;
+}
+
+ul .item-title {
+    text-align: right;
+    width: 3.2em;
+    display: inline-block;
+    margin: 5px 0 0 -46px;
+    display: block;
+    text-align: right;
+    position: absolute;
+}
+
+#suggest {
+    display: inline-block;
+    margin: 5px 0 0 5px;
+}
+
+#suggest a {
+    margin: 0 3px;
+}
+
+#state-mask {
+    display: none;
+    position: absolute;
+    width: 100%;
+    margin-top: 25px;
+    height: 270px;
+    background-color: #FFF;
+    opacity: 0.7;
+    z-index: 20;
+}
+
+#login-window {
+    display: none;
+    position: absolute;
+    width: 100%;
+    margin-top: 25px;
+    height: 240px;
+    padding: 20px 0;
+    background-color: #FFF;
+    z-index: 10;
+}
+
+#header {
+    height: 25px;
+    color: #AAA;
+}
+
+#header .logout {
+    float: right;
+}
+
+#header a {
+    color: #AAA;
+}
+
+#header a:hover {
+    color: #11A;
+}
+
+#header .logo {
+    float: left;
+    padding-top: 2px;
+}
+
+.logo-unlogin {
+    float: left;
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 30px;
+    background-color: #FFF;
+}
+
+#header .random {
+    margin: 0 0 0 5px;
+    color: #FFF;
+}
+
+#header .random:hover {
+    color: #AAA;
+}
+
+.alert {
+    display: none;
+    margin-left: 5px;
+    color: #333;
+    background: #CED;
+    float: left;
+    padding: 3px;
+    padding-top: 1px;
+    width: 300px;
+    border: 1px solid #ACC;
+}
+
+#delete {
+    display: none;
+}
+
+.auto-complete {
+    background-color: #FFF;
+    border: 1px solid #AAA;
+    box-shadow: 1px 1px 3px rgba(0, 0, 110, 0.33);
+    margin-left: 8px;
+    min-width: 200px;
+    position: absolute;
+}
+
+.auto-complete li {
+    background-color: #FFF;
+    border-bottom: 0 solid #FFF;
+    color: #2255AA;
+    margin: 0;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+.auto-complete .active {
+    background-color: #969696;
+    color: #FFF;
+}
+
+.auto-complete li.exclude {
+    display: none;
+}
