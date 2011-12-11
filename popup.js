@@ -80,9 +80,6 @@ var renderPageInfo = function (pageInfo) {
 };
 
 var getPageInfo = function (url) {
-    var cb = function (pageInfo) {
-        renderPageInfo(pageInfo);
-    };
     var pageInfo = bg.getPageInfo(url);
     if (pageInfo) {
         renderPageInfo(pageInfo);
