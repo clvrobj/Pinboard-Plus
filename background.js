@@ -60,7 +60,7 @@ var updatePageInfo = function (url) {
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup && popup.showLoading('Loading bookmark...');
     var cb = function (pageInfo) {
-        popup.renderPageInfo(pageInfo);
+        popup && popup.renderPageInfo(pageInfo);
         updateSelectedTabExtIcon();
     };
     queryPinState({url: url, ready: cb});
@@ -163,6 +163,8 @@ var addPost = function (info) {
                                // error
                            }
                        });
+        var popup = chrome.extension.getViews({type: 'popup'})[0];
+        popup && popup.close();
     }
 };
 
@@ -205,7 +207,7 @@ var getSuggest = function (url) {
                                suggests.push($(res[i]).text());
                            }
                            var popup = chrome.extension.getViews({type: 'popup'})[0];
-                           popup.renderSuggests(suggests);
+                           popup && popup.renderSuggests(suggests);
                        });
     }
 };
