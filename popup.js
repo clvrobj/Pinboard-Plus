@@ -177,7 +177,7 @@ var init_autocomplete_suggest = function (o) {
                         if (ind >= len) ind = 0;
                     } else {
                         ind -= 1;
-                        if (ind < 0) ind = len;
+                        if (ind < 0) ind = len - 1;
                     }
                     activeSuggestConbyIndex(ind);
                     return;
