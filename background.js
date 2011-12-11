@@ -58,7 +58,7 @@ var getPageInfo = function (url) {
 // refresh page info even page info has fetched from server
 var updatePageInfo = function (url) {
     var popup = chrome.extension.getViews({type: 'popup'})[0];
-    popup.showLoading('Loading bookmark...');
+    popup && popup.showLoading('Loading bookmark...');
     var cb = function (pageInfo) {
         popup.renderPageInfo(pageInfo);
         updateSelectedTabExtIcon();
@@ -106,8 +106,9 @@ var queryPinState = function (info) {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", getMainPath() + 'posts/get?url=' + url, true);
         xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                var post = xhr.responseXML.documentElement.getElementsByTagName("post"), pageInfo;
+            var pageInfo = {isSaved: false};
+            if (xhr.readyState == 4 && xhr.responseXML && xhr.responseXML.documentElement) {
+                var post = xhr.responseXML.documentElement.getElementsByTagName("post");
                 if (post.length > 0) {                    
                     var attrs = post[0].attributes;
                     pageInfo = {url: attrs.getAttrVal("href"), 
@@ -118,12 +119,10 @@ var queryPinState = function (info) {
                                 shared: attrs.getAttrVal("shared") == 'no' ? false:true,
                                 toread: attrs.getAttrVal("toread") == 'yes' ? true:false,
                                 isSaved: true};
-                } else {
-                    pageInfo = {isSaved: false};
                 }
                 pages[url] = pageInfo;
-                info.ready && info.ready(pageInfo);
             }
+            info.ready && info.ready(pageInfo);
         };
         xhr.send();
     }
