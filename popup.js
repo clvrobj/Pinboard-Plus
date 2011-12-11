@@ -51,7 +51,18 @@ var renderPageInfo = function (pageInfo) {
             $('#user').text(userInfo.name);
             pageInfo.url && $('#url').val(pageInfo.url);
             pageInfo.title && $('#title').val(pageInfo.title);
-            pageInfo.desc && $('#desc').val(pageInfo.desc);
+            if (pageInfo.desc) {
+                $('#desc').val(pageInfo.desc);
+            } else {
+                chrome.tabs.getSelected(
+                    null, function(tab) {
+                        chrome.tabs.sendRequest(
+                            tab.id, {method: "getSelection"},
+                            function (response) {
+                                $('#desc').val(response.data);
+                            });
+                    });
+            }
             pageInfo.tag && $('#tag').val(pageInfo.tag.concat(' '));
             $('#private').attr('checked', !pageInfo.shared);
             $('#toread').attr('checked', pageInfo.toread);
