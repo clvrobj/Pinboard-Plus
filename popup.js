@@ -42,6 +42,17 @@ var renderSuggests = function (suggests) {
     }
 };
 
+var copySel2desc = function () {
+    chrome.tabs.getSelected(
+        null, function(tab) {
+            chrome.tabs.sendRequest(
+                tab.id, {method: "getSelection"},
+                function (response) {
+                    $('#desc').val(response.data);
+                });
+        });
+};
+
 var renderPageInfo = function (pageInfo) {
     var userInfo = checkLogin();
     if (userInfo) {
@@ -51,18 +62,7 @@ var renderPageInfo = function (pageInfo) {
             $('#user').text(userInfo.name);
             pageInfo.url && $('#url').val(pageInfo.url);
             pageInfo.title && $('#title').val(pageInfo.title);
-            if (pageInfo.desc) {
-                $('#desc').val(pageInfo.desc);
-            } else {
-                chrome.tabs.getSelected(
-                    null, function(tab) {
-                        chrome.tabs.sendRequest(
-                            tab.id, {method: "getSelection"},
-                            function (response) {
-                                $('#desc').val(response.data);
-                            });
-                    });
-            }
+            pageInfo.desc ? $('#desc').val(pageInfo.desc) : copySel2desc();
             pageInfo.tag && $('#tag').val(pageInfo.tag.concat(' '));
             $('#private').attr('checked', !pageInfo.shared);
             $('#toread').attr('checked', pageInfo.toread);
@@ -258,7 +258,7 @@ var initPopup = function () {
             null, function (tab) {
                 $('#url').val(tab.url);
                 $('#title').val(tab.title);
-                $('#desc').val('');
+                copySel2desc();
                 $('#tags').val('');
                 $('#private').attr('checked', false);
                 $('#toread').attr('checked', false);
