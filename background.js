@@ -2,7 +2,7 @@
 var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
 namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
 at = '@', pathBody = 'api.pinboard.in/v1/',
-yesIcon = 'icon_black_19.png', noIcon = 'icon_grey_19.png';
+yesIcon = 'icon_black_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
 
 var getMainPath = function () {
     var userInfo = getUserInfo(),
@@ -10,7 +10,7 @@ var getMainPath = function () {
     return 'https://' + authStr + at + pathBody;
 };
 
-// {url, title, desc, tag, time, isSaved}
+// {url, title, desc, tag, time, isSaved, isSaving}
 var pages = {};
 
 var logout = function () {
@@ -134,6 +134,8 @@ var updateSelectedTabExtIcon = function () {
                                 var iconPath = noIcon;
                                 if (pageInfo && pageInfo.isSaved) {
                                     iconPath = yesIcon;
+                                } else if (pageInfo && pageInfo.isSaving) {
+                                    iconPath = savingIcon;
                                 }
                                 chrome.browserAction.setIcon(
                                     {path: iconPath, tabId: tab.id});
@@ -165,6 +167,9 @@ var addPost = function (info) {
                        });
         var popup = chrome.extension.getViews({type: 'popup'})[0];
         popup && popup.close();
+        // change icon state
+        pages[info.url] = {isSaving: true};
+        updateSelectedTabExtIcon();
     }
 };
 

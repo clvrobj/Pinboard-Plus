@@ -5,7 +5,7 @@
   "browser_action": {
      "default_icon": "icon_grey_19.png",
      "popup": "popup.html",
-     "icons": ["icon_grey_19.png", "icon_black_19.png"]
+     "icons": ["icon_grey_19.png", "icon_black_19.png", "icon_grey_saving_19.png"]
   },
   "permissions": [
     "tabs",
