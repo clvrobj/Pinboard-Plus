@@ -69,7 +69,8 @@ ul .item-title {
 }
 
 #header .logout {
-    float: right;
+    position: absolute;
+    right: 5px;
 }
 
 #header a {
@@ -111,7 +112,7 @@ ul .item-title {
     float: left;
     padding: 3px;
     padding-top: 1px;
-    width: 300px;
+    width: 60%;
     border: 1px solid #ACC;
 }
 
