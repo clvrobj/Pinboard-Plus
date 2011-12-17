@@ -1,11 +1,11 @@
 {
   "name": "Pinboard Plus",
-  "version": "1.3",
+  "version": "1.4",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "browser_action": {
      "default_icon": "icon_grey_19.png",
      "popup": "popup.html",
-     "icons": ["icon_grey_19.png", "icon_black_19.png", "icon_grey_saving_19.png"]
+     "icons": ["icon_grey_19.png", "icon_colored_19.png", "icon_grey_saving_19.png"]
   },
   "permissions": [
     "tabs",
