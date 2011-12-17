@@ -2,7 +2,8 @@
 var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
 namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
 at = '@', pathBody = 'api.pinboard.in/v1/',
-yesIcon = 'icon_black_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
+yesIcon = 'icon_colored_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
+var REQ_TIME_OUT = 125 * 1000;
 
 var getMainPath = function () {
     var userInfo = getUserInfo(),
@@ -10,7 +11,7 @@ var getMainPath = function () {
     return 'https://' + authStr + at + pathBody;
 };
 
-// {url, title, desc, tag, time, isSaved, isSaving}
+// {url, title, desc, tag, time, isSaved, isSaving, isPendding}
 var pages = {};
 
 var logout = function () {
@@ -73,58 +74,76 @@ var login = function (name, pwd) {
     var path = 'https://' + name + ':' + pwd + at + pathBody + 'posts/update';
     var jqxhr = $.ajax({url: path,
                         type : 'GET',
+                        timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
                         contentType:'text/plain'});
-    jqxhr.complete(function (data) {
-                       var res = $(data.responseXML).find('update'),
-                       resTime = res.attr('time');
-                       if (resTime) { // success
-                           _userInfo.name = name;
-                           _userInfo.pwd = pwd;
-                           _userInfo.isChecked = true;
-                           localStorage[namekey] = name;
-                           localStorage[pwdkey] = pwd;
-                           localStorage[checkedkey] = true;
-                           chrome.tabs.getSelected(
-                               null, function (tab) {
-                                   updatePageInfo(tab.url);
-                               });
-                           _getTags();
-                       } else {
-                           // error
-                           var popup = chrome.extension.getViews({type: 'popup'})[0];
-                           popup.loginFailed();
-                       }
-                   });
+    jqxhr.always(function (data) {
+                     var res = $(data.responseXML).find('update'),
+                     resTime = res.attr('time');
+                     if (resTime) { // success
+                         _userInfo.name = name;
+                         _userInfo.pwd = pwd;
+                         _userInfo.isChecked = true;
+                         localStorage[namekey] = name;
+                         localStorage[pwdkey] = pwd;
+                         localStorage[checkedkey] = true;
+                         chrome.tabs.getSelected(
+                             null, function (tab) {
+                                 updatePageInfo(tab.url);
+                             });
+                         _getTags();
+                     } else {
+                         // error
+                         var popup = chrome.extension.getViews({type: 'popup'})[0];
+                         popup.loginFailed();
+                     }
+                 });
+    jqxhr.fail(function (data) {
+                   if (data.statusText == 'timeout') {
+                   }
+               });
 };
 
+var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
-    if (userInfo && userInfo.isChecked && info.url) {
+    if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked && info.url) {
+        isQuerying = true;
+        clearTimeout(tQuery);
+        tQuery = setTimeout(function () {
+                                isQuerying = false;
+                            }, QUERY_INTERVAL);
         var url = info.url;
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", getMainPath() + 'posts/get?url=' + url, true);
-        xhr.onreadystatechange = function() {
-            var pageInfo = {isSaved: false};
-            if (xhr.readyState == 4 && xhr.responseXML && xhr.responseXML.documentElement) {
-                var post = xhr.responseXML.documentElement.getElementsByTagName("post");
-                if (post.length > 0) {                    
-                    var attrs = post[0].attributes;
-                    pageInfo = {url: attrs.getAttrVal("href"), 
-                                title: attrs.getAttrVal("description"),
-                                desc: attrs.getAttrVal("extended"),
-                                tag: attrs.getAttrVal("tag"),
-                                time: attrs.getAttrVal("time"),
-                                shared: attrs.getAttrVal("shared") == 'no' ? false:true,
-                                toread: attrs.getAttrVal("toread") == 'yes' ? true:false,
-                                isSaved: true};
-                }
-                pages[url] = pageInfo;
-            }
-            info.ready && info.ready(pageInfo);
-        };
-        xhr.send();
+        var jqxhr = $.ajax({url: getMainPath() + 'posts/get?url=' + url,
+                            type : 'GET',
+                            //timeout: REQ_TIME_OUT,
+                            dataType: 'json',
+                            crossDomain: true,
+                            contentType:'text/plain'});
+        jqxhr.always(function (data) {
+                         isQuerying = false;
+                         clearTimeout(tQuery);
+                         var post = $(data.responseXML).find('post'),
+                         pageInfo = {isSaved: false};
+                         if (post.length) {
+                             pageInfo = {url: post.attr("href"), 
+                                         title: post.attr("description"),
+                                         desc: post.attr("extended"),
+                                         tag: post.attr("tag"),
+                                         time: post.attr("time"),
+                                         shared: post.attr("shared") == 'no' ? false:true,
+                                         toread: post.attr("toread") == 'yes' ? true:false,
+                                         isSaved: true};
+                         }
+                         pages[url] = pageInfo;
+                         info.ready && info.ready(pageInfo);
+                     });
+        jqxhr.fail(function (data) {
+                       if (data.statusText == 'timeout') {
+                           delete pages[url];
+                       }
+                   });
     }
 };
 
@@ -151,20 +170,27 @@ var addPost = function (info) {
         info.shared && (data['shared'] = info.shared);
         info.toread && (data['toread'] = info.toread);
         var jqxhr = $.ajax({url: path,
-                type : 'GET',
-                dataType: 'json',
-                crossDomain: true,
-                data: data,
-                contentType:'text/plain'});
-        jqxhr.complete(function (data) {
-                           var res = $(data.responseXML).find('result'),
-                           resCode = res.attr('code');
-                           if (resCode == 'done') {
-                               updatePageInfo(info.url);
-                           } else {
-                               // error
-                           }
+                            type : 'GET',
+                            timeout: REQ_TIME_OUT,
+                            dataType: 'json',
+                            crossDomain: true,
+                            data: data,
+                            contentType:'text/plain'});
+        jqxhr.always(function (data) {
+                         var res = $(data.responseXML).find('result'),
+                         resCode = res.attr('code');
+                         if (resCode == 'done') {
+                             // done
+                             pages[info.url] = {isSaved: true};
+                         } else {
+                             // error
+                             pages[info.url] = {isSaved: false};
+                         }
+                         updateSelectedTabExtIcon();
+                         queryPinState({url: info.url, isForce: true});
                        });
+        jqxhr.fail(function (data) {
+                   });
         var popup = chrome.extension.getViews({type: 'popup'})[0];
         popup && popup.close();
         // change icon state
@@ -178,21 +204,24 @@ var deletePost = function (url) {
     if (userInfo && userInfo.isChecked && url) {
         var path = getMainPath() + 'posts/delete?';
         var jqxhr = $.ajax({url: path,
-                type : 'GET',
-                dataType: 'json',
-                crossDomain: true,
-                data: {url: url},
-                contentType:'text/plain'});
-        jqxhr.complete(function (data) {
-                           var res = $(data.responseXML).find('result'),
-                           resCode = res.attr('code');
-                           if (resCode == 'done') {
-                               delete pages[url];
-                               updatePageInfo(url);
-                           } else {
-                               // error
-                           }
-                       });
+                            type : 'GET',
+                            timeout: REQ_TIME_OUT,
+                            dataType: 'json',
+                            crossDomain: true,
+                            data: {url: url},
+                            contentType:'text/plain'});
+        jqxhr.always(function (data) {
+                         var res = $(data.responseXML).find('result'),
+                         resCode = res.attr('code');
+                         if (resCode == 'done') {
+                             delete pages[url];
+                             updateSelectedTabExtIcon();
+                         } else {
+                             // error
+                         }
+                         var popup = chrome.extension.getViews({type: 'popup'})[0];
+                         popup && popup.close();
+                     });
     }
 };
 
@@ -201,19 +230,20 @@ var getSuggest = function (url) {
     if (userInfo && userInfo.isChecked && url) {
         var path = getMainPath() + 'posts/suggest?url=' + url,
         jqxhr = $.ajax({url: path,
-                type : 'GET',
-                dataType: 'json',
-                crossDomain: true,
-                contentType:'text/plain'});
-        jqxhr.complete(function (data) {
-                           var res = $(data.responseXML).find('popular'),
-                           suggests = [];
-                           for (var i=0, len = res.length; i<len; i++) {
-                               suggests.push($(res[i]).text());
-                           }
-                           var popup = chrome.extension.getViews({type: 'popup'})[0];
-                           popup && popup.renderSuggests(suggests);
-                       });
+                        type : 'GET',
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'});
+        jqxhr.always(function (data) {
+                         var res = $(data.responseXML).find('popular'),
+                         suggests = [];
+                         for (var i=0, len = res.length; i<len; i++) {
+                             suggests.push($(res[i]).text());
+                         }
+                         var popup = chrome.extension.getViews({type: 'popup'})[0];
+                         popup && popup.renderSuggests(suggests);
+                     });
     }
 };
 
@@ -227,26 +257,38 @@ var _getTags = function () {
     if (userInfo && userInfo.isChecked) {
         var path = getMainPath() + 'tags/get',
         jqxhr = $.ajax({url: path,
-                type : 'GET',
-                dataType: 'json',
-                crossDomain: true,
-                contentType:'text/plain'});
-        jqxhr.complete(function (data) {
-                           var res = $(data.responseXML).find('tag');
-                           _tags = [];
-                           for (var i=0, len = res.length; i<len; i++) {
-                               _tags.push(res[i].attributes.getAttrVal('tag'));
-                           }
-                       });
+                        type : 'GET',
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'});
+        jqxhr.always(function (data) {
+                         var res = $(data.responseXML).find('tag');
+                         _tags = [];
+                         for (var i=0, len = res.length; i<len; i++) {
+                             _tags.push(res[i].attributes.getAttrVal('tag'));
+                         }
+                     });
     }
 };
 _getTags();
+
+// query at first time extension loaded
+chrome.tabs.getSelected(null, function (tab) {
+                            queryPinState({url: tab.url,
+                                           ready: function (pageInfo) {
+                                               if (pageInfo && pageInfo.isSaved) {
+                                                   chrome.browserAction.setIcon(
+                                                       {path: yesIcon, tabId: tab.id});
+                                               }
+                                           }});
+                        });
 
 chrome.tabs.onUpdated.addListener(
     function(id, changeInfo, tab) {
         if (changeInfo.url) {
             var url = changeInfo.url;
-            if (!pages[url]) {                
+            if (!pages.hasOwnProperty(url)) {
                 chrome.browserAction.setIcon({path: noIcon, tabId: tab.id});
                 queryPinState({url: url,
                                ready: function (pageInfo) {
@@ -263,27 +305,19 @@ chrome.tabs.onUpdated.addListener(
         }
     });
 
-chrome.tabs.getSelected(null, function (tab) {
-                            queryPinState({url: tab.url,
-                                           ready: function (pageInfo) {
-                                               if (pageInfo && pageInfo.isSaved) {
-                                                   chrome.browserAction.setIcon(
-                                                       {path: yesIcon,
-                                                        tabId: tab.id});
-                                               }
-                                           }});
-                        });
-
 chrome.tabs.onSelectionChanged.addListener(
     function(tabId, selectInfo) {
-        chrome.tabs.getSelected(null, function (tab) {
-                            queryPinState({url: tab.url,
-                                           ready: function (pageInfo) {
-                                               if (pageInfo && pageInfo.isSaved) {
-                                                   chrome.browserAction.setIcon(
-                                                       {path: yesIcon,
-                                                        tabId: tab.id});
-                                               }
-                                           }});
-                        });
+        chrome.tabs.getSelected(
+            null, function (tab) {
+                var url = tab.url;
+                if (!pages.hasOwnProperty(url)) {
+                    queryPinState({url: url,
+                                   ready: function (pageInfo) {
+                                       if (pageInfo && pageInfo.isSaved) {
+                                           chrome.browserAction.setIcon(
+                                               {path: yesIcon, tabId: tab.id});
+                                       }
+                                   }});
+                }
+            });
     });

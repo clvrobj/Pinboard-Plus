@@ -83,7 +83,7 @@ var renderPageInfo = function (pageInfo) {
                 $('#delete').show();
             }
         } else {
-            initPopup();
+            //initPopup();
         }
         $('#tag').focus();
         resume_autocomplete_suggest();
