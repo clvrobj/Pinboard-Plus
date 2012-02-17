@@ -85,7 +85,6 @@ var renderPageInfo = function (pageInfo) {
         } else {
             initPopup();
         }
-        $('#tag').focus();
         resume_autocomplete_suggest();
     }
 };
@@ -318,4 +317,6 @@ $(function () {
           function () {openUrl('https://pinboard.in/random/?type=unread');});
 
       init_autocomplete_suggest($('#tag'));
+
+      $('#tag').focus();
   });
