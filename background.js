@@ -47,6 +47,9 @@ NamedNodeMap.prototype.getAttrVal = function (attrName) {
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 var getPageInfo = function (url) {
+    if (!url || url == 'chrome://newtab/') {
+        return {isSaved:false};
+    }
     var pageInfo = pages[url];
     if (pageInfo) {
         return pageInfo;
@@ -108,7 +111,8 @@ var login = function (name, pwd) {
 var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
-    if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked && info.url) {
+    if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
+        info.url && info.url != 'chrome://newtab/') {
         isQuerying = true;
         clearTimeout(tQuery);
         tQuery = setTimeout(function () {
