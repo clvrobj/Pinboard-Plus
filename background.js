@@ -72,14 +72,14 @@ var updatePageInfo = function (url) {
 
 var login = function (name, pwd) {
     // test auth
-    name = encodeURIComponent(name);
-    pwd = encodeURIComponent(pwd);
-    var path = 'https://' + name + ':' + pwd + at + pathBody + 'posts/update';
+    var path = 'https://' + pathBody + 'posts/update';
     var jqxhr = $.ajax({url: path,
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
+                        username: name,
+                        password: pwd,
                         contentType:'text/plain'});
     jqxhr.always(function (data) {
                      var res = $(data.responseXML).find('update'),
