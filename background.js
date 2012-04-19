@@ -1,18 +1,23 @@
 // userInfo: name, pwd, isChecked
 var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
 namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
-at = '@', pathBody = 'api.pinboard.in/v1/',
+mainPath = 'https://api.pinboard.in/v1/',
 yesIcon = 'icon_colored_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
 var REQ_TIME_OUT = 125 * 1000;
 
-var getMainPath = function () {
-    var userInfo = getUserInfo(),
-    authStr = userInfo.name + ':' + userInfo.pwd;
-    return 'https://' + authStr + at + pathBody;
-};
-
 // {url, title, desc, tag, time, isSaved, isSaving, isPendding}
 var pages = {};
+
+var makeBasicAuthHeader = function(user, password) {
+    var tok = user + ':' + password;
+    var hash = btoa(tok);
+    return "Basic " + hash;
+};
+
+var makeUserAuthHeader = function() {
+    var userInfo = getUserInfo();
+    return makeBasicAuthHeader(userInfo.name, userInfo.pwd);
+};
 
 var logout = function () {
     _userInfo.isChecked = false;
@@ -72,15 +77,17 @@ var updatePageInfo = function (url) {
 
 var login = function (name, pwd) {
     // test auth
-    var path = 'https://' + pathBody + 'posts/update';
+    var path = mainPath + 'posts/update';
     var jqxhr = $.ajax({url: path,
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
-                        username: name,
-                        password: pwd,
-                        contentType:'text/plain'});
+                        contentType:'text/plain',
+                        beforeSend: function (jqxhr, settings) {
+                            jqxhr.setRequestHeader ("Authorization", makeBasicAuthHeader(name, pwd));
+                        }
+                    });
     jqxhr.always(function (data) {
                      var res = $(data.responseXML).find('update'),
                      resTime = res.attr('time');
@@ -119,12 +126,16 @@ var queryPinState = function (info) {
                                 isQuerying = false;
                             }, QUERY_INTERVAL);
         var url = info.url;
-        var jqxhr = $.ajax({url: getMainPath() + 'posts/get?url=' + url,
+        var jqxhr = $.ajax({url: mainPath + 'posts/get?url=' + url,
                             type : 'GET',
                             //timeout: REQ_TIME_OUT,
                             dataType: 'json',
                             crossDomain: true,
-                            contentType:'text/plain'});
+                            contentType:'text/plain',
+                            beforeSend: function (jqxhr, settings) {
+                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
+                            }
+                        });
         jqxhr.always(function (data) {
                          isQuerying = false;
                          clearTimeout(tQuery);
@@ -168,7 +179,7 @@ var updateSelectedTabExtIcon = function () {
 var addPost = function (info) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && info.url && info.title) {
-        var path = getMainPath() + 'posts/add?',
+        var path = mainPath + 'posts/add?',
         data = {description: info.title, url: info.url,
                 extended: info.desc, tags: info.tag};
         info.shared && (data['shared'] = info.shared);
@@ -179,7 +190,11 @@ var addPost = function (info) {
                             dataType: 'json',
                             crossDomain: true,
                             data: data,
-                            contentType:'text/plain'});
+                            contentType:'text/plain',
+                            beforeSend: function (jqxhr, settings) {
+                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
+                            }
+                        });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('result'),
                          resCode = res.attr('code');
@@ -206,14 +221,18 @@ var addPost = function (info) {
 var deletePost = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        var path = getMainPath() + 'posts/delete?';
+        var path = mainPath + 'posts/delete?';
         var jqxhr = $.ajax({url: path,
                             type : 'GET',
                             timeout: REQ_TIME_OUT,
                             dataType: 'json',
                             crossDomain: true,
                             data: {url: url},
-                            contentType:'text/plain'});
+                            contentType:'text/plain',
+                            beforeSend: function (jqxhr, settings) {
+                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
+                            }
+                        });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('result'),
                          resCode = res.attr('code');
@@ -232,13 +251,17 @@ var deletePost = function (url) {
 var getSuggest = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        var path = getMainPath() + 'posts/suggest?url=' + url,
+        var path = mainPath + 'posts/suggest?url=' + url,
         jqxhr = $.ajax({url: path,
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
-                        contentType:'text/plain'});
+                        contentType:'text/plain',
+                        beforeSend: function (jqxhr, settings) {
+                            jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
+                        }
+                    });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('popular'),
                          suggests = [];
@@ -259,13 +282,17 @@ var getTags = function () {
 var _getTags = function () {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked) {
-        var path = getMainPath() + 'tags/get',
+        var path = mainPath + 'tags/get',
         jqxhr = $.ajax({url: path,
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
-                        contentType:'text/plain'});
+                        contentType:'text/plain',
+                        beforeSend: function (jqxhr, settings) {
+                            jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
+                        }
+                    });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('tag');
                          _tags = [];
