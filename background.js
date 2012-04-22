@@ -84,9 +84,7 @@ var login = function (name, pwd) {
                         dataType: 'json',
                         crossDomain: true,
                         contentType:'text/plain',
-                        beforeSend: function (jqxhr, settings) {
-                            jqxhr.setRequestHeader ("Authorization", makeBasicAuthHeader(name, pwd));
-                        }
+                        headers: {'Authorization': makeBasicAuthHeader(name, pwd)}
                     });
     jqxhr.always(function (data) {
                      var res = $(data.responseXML).find('update'),
@@ -132,9 +130,7 @@ var queryPinState = function (info) {
                             dataType: 'json',
                             crossDomain: true,
                             contentType:'text/plain',
-                            beforeSend: function (jqxhr, settings) {
-                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
-                            }
+                            headers: {'Authorization': makeUserAuthHeader()}
                         });
         jqxhr.always(function (data) {
                          isQuerying = false;
@@ -191,9 +187,7 @@ var addPost = function (info) {
                             crossDomain: true,
                             data: data,
                             contentType:'text/plain',
-                            beforeSend: function (jqxhr, settings) {
-                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
-                            }
+                            headers: {'Authorization': makeUserAuthHeader()}
                         });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('result'),
@@ -229,9 +223,7 @@ var deletePost = function (url) {
                             crossDomain: true,
                             data: {url: url},
                             contentType:'text/plain',
-                            beforeSend: function (jqxhr, settings) {
-                                jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
-                            }
+                            headers: {'Authorization': makeUserAuthHeader()}
                         });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('result'),
@@ -258,9 +250,7 @@ var getSuggest = function (url) {
                         dataType: 'json',
                         crossDomain: true,
                         contentType:'text/plain',
-                        beforeSend: function (jqxhr, settings) {
-                            jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
-                        }
+                        headers: {'Authorization': makeUserAuthHeader()}
                     });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('popular'),
@@ -289,9 +279,7 @@ var _getTags = function () {
                         dataType: 'json',
                         crossDomain: true,
                         contentType:'text/plain',
-                        beforeSend: function (jqxhr, settings) {
-                            jqxhr.setRequestHeader ("Authorization", makeUserAuthHeader());
-                        }
+                        headers: {'Authorization': makeUserAuthHeader()}
                     });
         jqxhr.always(function (data) {
                          var res = $(data.responseXML).find('tag');
