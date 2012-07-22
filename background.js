@@ -253,9 +253,10 @@ var getSuggest = function (url) {
                         headers: {'Authorization': makeUserAuthHeader()}
                     });
         jqxhr.always(function (data) {
-                         var res = $(data.responseXML).find('popular'),
+                         var res = $.makeArray($(data.responseXML).find('recommended')).concat(
+                             $.makeArray($(data.responseXML).find('recommended'))),
                          suggests = [];
-                         for (var i=0, len = res.length; i<len; i++) {
+                         for (var i=0, len = res.length; i<len && i<=5; i++) {
                              suggests.push($(res[i]).text());
                          }
                          var popup = chrome.extension.getViews({type: 'popup'})[0];
