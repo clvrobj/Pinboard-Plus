@@ -1,15 +1,16 @@
 var bg = chrome.extension.getBackgroundPage(), curTabUrl = '', tags = [];
+var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80};
 
 var SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
 Date.prototype.getTimePassed = function () {
     var ret = {day: 0, hour: 0, min: 0, sec: 0, offset: -1},
-    offset = new Date() - this;
+    offset = new Date() - this, r;
     if (offset<=0) return ret;
     ret.offset = offset;
-    ret.week = Math.floor(offset/WEEK); var r = offset%WEEK;
-    ret.day = Math.floor(offset/DAY); var r = offset%DAY;
-    ret.hour = Math.floor(r/HOUR), r = r%HOUR;
-    ret.min = Math.floor(r/MIN), r = r%MIN;
+    ret.week = Math.floor(offset/WEEK); r = offset%WEEK;
+    ret.day = Math.floor(offset/DAY); r = offset%DAY;
+    ret.hour = Math.floor(r/HOUR); r = r%HOUR;
+    ret.min = Math.floor(r/MIN); r = r%MIN;
     ret.sec = Math.floor(r/SEC);
     return ret;
 };
@@ -33,12 +34,13 @@ var renderSuggests = function (suggests) {
             suggestsStr = suggestsStr.concat('<a href="#">', suggests[i], '</a>');
         }
         $('#suggest').html(suggestsStr);
-        $('#suggest a').click(function (e) {
-                                  var s = $(e.target).text(), t = $('#tag').val();
-                                  if ($.inArray(s, t.split(' ')) == -1) {
-                                      $('#tag').val(t + ' ' + s);
-                                  }
-                              });
+        $('#suggest a').click(
+            function (e) {
+                var s = $(e.target).text(), t = $('#tag').val();
+                if ($.inArray(s, t.split(' ')) == -1) {
+                    $('#tag').val(t + ' ' + s);
+                }
+            });
     }
 };
 
@@ -101,7 +103,7 @@ var getPageInfo = function (url) {
 var checkLogin = function () {
     var userInfo = bg.getUserInfo();
     if (!userInfo || !userInfo.isChecked) {
-        showLoginWindow();        
+        showLoginWindow();
         return false;
     } else {
         hideLoginWindow();
@@ -132,14 +134,14 @@ var showLoginWindow = function () {
     $('#login-window #username').unbind('keypress').keypress(
         function (e) {
             var code = e.keyCode || e.which;
-            if(code == 13) {
+            if(code == keyCode.enter) {
                 submit();
             }
         });
     $('#login-window #password').unbind('keypress').keypress(
         function (e) {
             var code = e.keyCode || e.which;
-            if(code == 13) {
+            if(code == keyCode.enter) {
                 submit();
             }
         });
@@ -159,29 +161,36 @@ resume_autocomplete_suggest = function (o) {
 
 var init_autocomplete_suggest = function (o) {
     // auto complete
+    var processKey = function (e) {
+        var code = e.charCode? e.charCode : e.keyCode;
+        if (code) {
+            if (code == keyCode.enter || code == keyCode.tab) {
+                submitSuggestCon(suggestsBox.find('.active')[0]);
+                return true;
+            } else if (code == keyCode.up || code == keyCode.down ||
+                       code == keyCode.n || code == keyCode.p ||
+                       code == keyCode.ctrl) {
+                var lis = suggestsBox.find('li').not('.exclude'), len= lis.length,
+                ind = lis.index(suggestsBox.find('.active'));
+                if (code == keyCode.down ||
+                    (code == keyCode.n  && e.ctrlKey == true)) {
+                    ind += 1;
+                    if (ind >= len) ind = 0;
+                } else if (code == keyCode.up ||
+                           (code == keyCode.p  && e.ctrlKey == true)) {
+                    ind -= 1;
+                    if (ind < 0) ind = len - 1;
+                }
+                activeSuggestConbyIndex(ind);
+                return true;
+            }
+        }
+        return false;
+    };
     $(o).live(
         'keyup',
         function (e) {
-            // arrow / enter / tab key
-            var code = e.charCode? e.charCode : e.keyCode;
-            if (code) {
-                if (code == 13 || code == 9) {
-                    submitSuggestCon(suggestsBox.find('.active')[0]);
-                    return;
-                } else if (code == 38 || code == 40) {
-                    var lis = suggestsBox.find('li').not('.exclude'), len= lis.length,
-                    ind = lis.index(suggestsBox.find('.active'));
-                    if (code == 40) { // down
-                        ind += 1;
-                        if (ind >= len) ind = 0;
-                    } else {
-                        ind -= 1;
-                        if (ind < 0) ind = len - 1;
-                    }
-                    activeSuggestConbyIndex(ind);
-                    return;
-                }
-            }
+            if (processKey(e)) return;
             var items = $(e.target).val().split(' '), word = items[items.length - 1],
             match_inds = [];
             if (!word || word == '') {
@@ -208,10 +217,11 @@ var init_autocomplete_suggest = function (o) {
 
     $(o).live('keydown', function (e) {
                   var code = e.charCode? e.charCode : e.keyCode;
-                  if (code && code == 13 && suggestsBox.find('.active').length == 0) {
+                  if (code && code == keyCode.enter &&
+                      suggestsBox.find('.active').length == 0) {
                       return true;
                   }
-                  return !(code && (code == 13 || code == 9));
+                  return !(code && (code == keyCode.enter || code == keyCode.tab));
               });
 
     var activeSuggestConbyIndex = function (index) {
@@ -245,7 +255,7 @@ var init_autocomplete_suggest = function (o) {
     var pos = $(o).offset();
     pos.top = pos.top + $(o).outerHeight();
     suggestsBox.css({'left': pos.left, 'top': pos.top});
-    suggestsBox.hide();    
+    suggestsBox.hide();
 };
 
 var initPopup = function () {
