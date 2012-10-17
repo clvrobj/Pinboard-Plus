@@ -1,5 +1,5 @@
 var bg = chrome.extension.getBackgroundPage(), curTabUrl = '', tags = [];
-var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80, comma:188, space:32};
+var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80};
 
 var SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
 Date.prototype.getTimePassed = function () {
