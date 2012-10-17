@@ -1,5 +1,5 @@
 var bg = chrome.extension.getBackgroundPage(), curTabUrl = '', tags = [];
-var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80};
+var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80, comma:188, space:32};
 
 var SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
 Date.prototype.getTimePassed = function () {
@@ -165,7 +165,10 @@ var init_autocomplete_suggest = function (o) {
         var code = e.charCode? e.charCode : e.keyCode;
         if (code) {
             if (code == keyCode.enter || code == keyCode.tab) {
-                submitSuggestCon(suggestsBox.find('.active')[0]);
+                //this will only submit a suggestion if the suggestion box is open
+                if(suggestsBox.is(":visible")){
+                  submitSuggestCon(suggestsBox.find('.active')[0]);
+                }
                 return true;
             } else if (code == keyCode.up || code == keyCode.down ||
                        code == keyCode.n || code == keyCode.p ||
@@ -218,7 +221,7 @@ var init_autocomplete_suggest = function (o) {
     $(o).live('keydown', function (e) {
                   var code = e.charCode? e.charCode : e.keyCode;
                   if (code && code == keyCode.enter &&
-                      suggestsBox.find('.active').length == 0) {
+                      suggestsBox.find('.active').length == 0 || suggestsBox.is(':hidden')) {
                       return true;
                   }
                   return !(code && (code == keyCode.enter || code == keyCode.tab));
