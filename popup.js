@@ -165,7 +165,10 @@ var init_autocomplete_suggest = function (o) {
         var code = e.charCode? e.charCode : e.keyCode;
         if (code) {
             if (code == keyCode.enter || code == keyCode.tab) {
-                submitSuggestCon(suggestsBox.find('.active')[0]);
+                //this will only submit a suggestion if the suggestion box is open
+                if(suggestsBox.is(":visible")){
+                  submitSuggestCon(suggestsBox.find('.active')[0]);
+                }
                 return true;
             } else if (code == keyCode.up || code == keyCode.down ||
                        code == keyCode.n || code == keyCode.p ||
@@ -218,7 +221,7 @@ var init_autocomplete_suggest = function (o) {
     $(o).live('keydown', function (e) {
                   var code = e.charCode? e.charCode : e.keyCode;
                   if (code && code == keyCode.enter &&
-                      suggestsBox.find('.active').length == 0) {
+                      suggestsBox.find('.active').length == 0 || suggestsBox.is(':hidden')) {
                       return true;
                   }
                   return !(code && (code == keyCode.enter || code == keyCode.tab));
