@@ -110,7 +110,29 @@ var login = function (name, pwd) {
 var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
-    if (localStorage[pingkey] !== 'true') return;
+    var url = info.url;
+    var handler = function (data) {
+        isQuerying = false;
+        clearTimeout(tQuery);
+        var post = $(data.responseXML).find('post'),
+        pageInfo = {isSaved: false};
+        if (post.length) {
+            pageInfo = {url: post.attr("href"),
+                title: post.attr("description"),
+                desc: post.attr("extended"),
+                tag: post.attr("tag"),
+                time: post.attr("time"),
+                shared: post.attr("shared") == 'no' ? false:true,
+                toread: post.attr("toread") == 'yes' ? true:false,
+                isSaved: true};
+        }
+        pages[url] = pageInfo;
+        info.ready && info.ready(pageInfo);
+    };
+    if (localStorage[pingkey] !== 'true' && !info.isForce) {
+        handler({responseXML: ''}) // a fake response
+        return;
+    }
     if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
         info.url && info.url != 'chrome://newtab/') {
         isQuerying = true;
@@ -118,7 +140,6 @@ var queryPinState = function (info) {
         tQuery = setTimeout(function () {
                                 isQuerying = false;
                             }, QUERY_INTERVAL);
-        var url = info.url;
         var jqxhr = $.ajax({url: mainPath + 'posts/get?url=' + url,
                             type : 'GET',
                             //timeout: REQ_TIME_OUT,
@@ -127,24 +148,8 @@ var queryPinState = function (info) {
                             contentType:'text/plain',
                             headers: {'Authorization': makeUserAuthHeader()}
                         });
-        jqxhr.always(function (data) {
-                         isQuerying = false;
-                         clearTimeout(tQuery);
-                         var post = $(data.responseXML).find('post'),
-                         pageInfo = {isSaved: false};
-                         if (post.length) {
-                             pageInfo = {url: post.attr("href"), 
-                                         title: post.attr("description"),
-                                         desc: post.attr("extended"),
-                                         tag: post.attr("tag"),
-                                         time: post.attr("time"),
-                                         shared: post.attr("shared") == 'no' ? false:true,
-                                         toread: post.attr("toread") == 'yes' ? true:false,
-                                         isSaved: true};
-                         }
-                         pages[url] = pageInfo;
-                         info.ready && info.ready(pageInfo);
-                     });
+
+        jqxhr.always(handler);
         jqxhr.fail(function (data) {
                        if (data.statusText == 'timeout') {
                            delete pages[url];
