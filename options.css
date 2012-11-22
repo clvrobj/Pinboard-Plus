@@ -1,0 +1,30 @@
+body {
+    color: #333;
+    font-family: helvetica;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+header, section {
+  padding: .5em 5%;
+}
+header {
+  background: #efefef;
+  border-bottom: 1px solid #ccc;
+}
+header + section {
+  box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+span.checkbox {
+  display: block;
+  float: left;
+  width: 3em;
+  height: 3em;
+  vertical-align: top;
+}
+
+.meta {
+  color: #999;
+}

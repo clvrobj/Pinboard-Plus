@@ -1,10 +1,3 @@
-// userInfo: name, pwd, isChecked
-var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
-namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
-mainPath = 'https://api.pinboard.in/v1/',
-yesIcon = 'icon_colored_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
-var REQ_TIME_OUT = 125 * 1000;
-
 // {url, title, desc, tag, time, isSaved, isSaving, isPendding}
 var pages = {};
 
@@ -24,6 +17,7 @@ var logout = function () {
     localStorage.removeItem(checkedkey);
     localStorage.removeItem(namekey);
     localStorage.removeItem(pwdkey);
+    localStorage.removeItem(pingkey);
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup.showLoginWindow();
 };
@@ -116,6 +110,29 @@ var login = function (name, pwd) {
 var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
+    var url = info.url;
+    var handler = function (data) {
+        isQuerying = false;
+        clearTimeout(tQuery);
+        var post = $(data.responseXML).find('post'),
+        pageInfo = {isSaved: false};
+        if (post.length) {
+            pageInfo = {url: post.attr("href"),
+                title: post.attr("description"),
+                desc: post.attr("extended"),
+                tag: post.attr("tag"),
+                time: post.attr("time"),
+                shared: post.attr("shared") == 'no' ? false:true,
+                toread: post.attr("toread") == 'yes' ? true:false,
+                isSaved: true};
+        }
+        pages[url] = pageInfo;
+        info.ready && info.ready(pageInfo);
+    };
+    if (localStorage[pingkey] !== 'true' && !info.isForce) {
+        handler({responseXML: ''}) // a fake response
+        return;
+    }
     if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
         info.url && info.url != 'chrome://newtab/') {
         isQuerying = true;
@@ -123,7 +140,6 @@ var queryPinState = function (info) {
         tQuery = setTimeout(function () {
                                 isQuerying = false;
                             }, QUERY_INTERVAL);
-        var url = info.url;
         var jqxhr = $.ajax({url: mainPath + 'posts/get?url=' + url,
                             type : 'GET',
                             //timeout: REQ_TIME_OUT,
@@ -132,24 +148,8 @@ var queryPinState = function (info) {
                             contentType:'text/plain',
                             headers: {'Authorization': makeUserAuthHeader()}
                         });
-        jqxhr.always(function (data) {
-                         isQuerying = false;
-                         clearTimeout(tQuery);
-                         var post = $(data.responseXML).find('post'),
-                         pageInfo = {isSaved: false};
-                         if (post.length) {
-                             pageInfo = {url: post.attr("href"), 
-                                         title: post.attr("description"),
-                                         desc: post.attr("extended"),
-                                         tag: post.attr("tag"),
-                                         time: post.attr("time"),
-                                         shared: post.attr("shared") == 'no' ? false:true,
-                                         toread: post.attr("toread") == 'yes' ? true:false,
-                                         isSaved: true};
-                         }
-                         pages[url] = pageInfo;
-                         info.ready && info.ready(pageInfo);
-                     });
+
+        jqxhr.always(handler);
         jqxhr.fail(function (data) {
                        if (data.statusText == 'timeout') {
                            delete pages[url];

@@ -28,5 +28,6 @@
     "16": "appicon_16.png",
     "48": "appicon_48.png",
     "128": "appicon_128.png"
-  }
+  },
+  "options_page": "options.html"
 }
