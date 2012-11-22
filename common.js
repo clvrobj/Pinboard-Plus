@@ -1,6 +1,7 @@
 // userInfo: name, pwd, isChecked
 var _userInfo = null, _tags = [], keyprefix = 'pbuinfo',
 namekey = keyprefix + 'n', pwdkey = keyprefix + 'p', checkedkey = keyprefix + 'c',
+pingkey = keyprefix + 'g',
 mainPath = 'https://api.pinboard.in/v1/',
 yesIcon = 'icon_colored_19.png', noIcon = 'icon_grey_19.png', savingIcon = 'icon_grey_saving_19.png';
 var REQ_TIME_OUT = 125 * 1000;
@@ -24,6 +25,7 @@ var logout = function () {
     localStorage.removeItem(checkedkey);
     localStorage.removeItem(namekey);
     localStorage.removeItem(pwdkey);
+    localStorage.removeItem(pingkey);
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup.showLoginWindow();
 };
@@ -116,6 +118,7 @@ var login = function (name, pwd) {
 var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
     var userInfo = getUserInfo();
+    if (localStorage[pingkey] !== 'true') return;
     if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
         info.url && info.url != 'chrome://newtab/') {
         isQuerying = true;
