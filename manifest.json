@@ -1,6 +1,6 @@
 {
   "name": "Pinboard Plus",
-  "version": "1.10",
+  "version": "1.11",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -29,5 +29,15 @@
     "48": "appicon_48.png",
     "128": "appicon_128.png"
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "commands": {
+     "_execute_browser_action": {
+       "suggested_key": {
+          "windows": "Ctrl+Shift+P",
+          "mac": "Command+Shift+P",
+          "chromeos": "Ctrl+Shift+P",
+          "linux": "Ctrl+Shift+P"
+       }
+     }
+   }
 }
