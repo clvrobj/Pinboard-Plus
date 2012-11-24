@@ -1,4 +1,4 @@
-// {url, title, desc, tag, time, isSaved, isSaving, isPendding}
+// {url: {title, desc, tag, time, isSaved, isSaving, isPendding}}
 var pages = {};
 
 var makeBasicAuthHeader = function(user, password) {
@@ -17,7 +17,7 @@ var logout = function () {
     localStorage.removeItem(checkedkey);
     localStorage.removeItem(namekey);
     localStorage.removeItem(pwdkey);
-    localStorage.removeItem(pingkey);
+    localStorage.removeItem(nopingkey);
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup.showLoginWindow();
 };
@@ -46,7 +46,7 @@ NamedNodeMap.prototype.getAttrVal = function (attrName) {
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 var getPageInfo = function (url) {
-    if (!url || url == 'chrome://newtab/') {
+    if (!url || url == 'chrome://newtab/' || localStorage[nopingkey] === 'true') {
         return {isSaved:false};
     }
     var pageInfo = pages[url];
@@ -129,10 +129,6 @@ var queryPinState = function (info) {
         pages[url] = pageInfo;
         info.ready && info.ready(pageInfo);
     };
-    if (localStorage[pingkey] !== 'true' && !info.isForce) {
-        handler({responseXML: ''}) // a fake response
-        return;
-    }
     if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
         info.url && info.url != 'chrome://newtab/') {
         isQuerying = true;
