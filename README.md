@@ -17,3 +17,11 @@ Features:
 Install
 -------
 You can install in Chrome webstore: [Pinboard Plus](https://chrome.google.com/webstore/detail/mphdppdgoagghpmmhodmfajjlloijnbd)
+
+Contributors
+------------
+- [clvrobj](https://github.com/clvrobj)
+- [Chris Dzombak](https://github.com/cdzombak)
+- [concept47](https://github.com/concept47)
+- [seansay](https://github.com/seansay)
+- =[Ian Langworth ☠](https://github.com/statico)
