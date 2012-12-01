@@ -24,4 +24,4 @@ Contributors
 - [Chris Dzombak](https://github.com/cdzombak)
 - [concept47](https://github.com/concept47)
 - [seansay](https://github.com/seansay)
-- =[Ian Langworth ☠](https://github.com/statico)
+- [Ian Langworth ☠](https://github.com/statico)
