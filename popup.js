@@ -50,7 +50,9 @@ var copySel2desc = function () {
             chrome.tabs.sendRequest(
                 tab.id, {method: "getSelection"},
                 function (response) {
-                    $('#desc').val(response.data);
+                    if (response.data.length !== 0) {
+                      $('#desc').val('<blockquote>' + response.data + '</blockquote>');
+                    }
                 });
         });
 };
