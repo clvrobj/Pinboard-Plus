@@ -51,7 +51,8 @@ var copySel2desc = function () {
                 tab.id, {method: "getSelection"},
                 function (response) {
                     if (response.data.length !== 0) {
-                      $('#desc').val('<blockquote>' + response.data + '</blockquote>');
+                        $('#desc').val('<blockquote>' + response.data + '</blockquote>');
+                        $('#blockquote-hint').show();
                     }
                 });
         });

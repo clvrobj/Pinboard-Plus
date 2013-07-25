@@ -1,6 +1,6 @@
 body {
     width: 480px;
-    height: 300px;
+    height: 305px;
     color: #333;
     font-family: helvetica;
     font-size: 12px;
@@ -46,7 +46,7 @@ ul .item-title {
     position: absolute;
     width: 100%;
     margin-top: 25px;
-    height: 270px;
+    height: 275px;
     background-color: #FFF;
     opacity: 0.7;
     z-index: 20;
@@ -145,4 +145,10 @@ ul .item-title {
 
 .auto-complete li.exclude {
     display: none;
+}
+
+#blockquote-hint {
+    display: none;
+    color: #BEBEBE;
+    margin: 2px 0 0;
 }
