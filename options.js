@@ -1,8 +1,13 @@
 $(function() {
       // localStorage only stores string values
-      $('#no-ping').attr('checked', localStorage[nopingkey] === 'true')
+      $('#no-ping').attr('checked', localStorage[nopingKey] === 'true')
           .click(function () {
                      var value = $(this).is(':checked');
-                     localStorage[nopingkey] = value;
+                     localStorage[nopingKey] = value;
+                 });
+      $('#all-private').attr('checked', localStorage[allprivateKey] === 'true')
+          .click(function () {
+                     var value = $(this).is(':checked');
+                     localStorage[allprivateKey] = value;
                  });
   });

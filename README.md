@@ -25,3 +25,9 @@ Contributors
 - [concept47](https://github.com/concept47)
 - [seansay](https://github.com/seansay)
 - [Ian Langworth ☠](https://github.com/statico)
+
+Donate
+------
+If you think Pinboard Plus is helpful, [please donate](https://www.gittip.com/clvrobj/), thanks!
+
+<https://www.gittip.com/clvrobj/>

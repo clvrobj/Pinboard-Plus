@@ -17,7 +17,7 @@ var logout = function () {
     localStorage.removeItem(checkedkey);
     localStorage.removeItem(namekey);
     localStorage.removeItem(pwdkey);
-    localStorage.removeItem(nopingkey);
+    localStorage.removeItem(nopingKey);
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup.showLoginWindow();
 };
@@ -46,7 +46,7 @@ NamedNodeMap.prototype.getAttrVal = function (attrName) {
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 var getPageInfo = function (url) {
-    if (!url || url == 'chrome://newtab/' || localStorage[nopingkey] === 'true') {
+    if (!url || url == 'chrome://newtab/' || localStorage[nopingKey] === 'true') {
         return {isSaved:false};
     }
     var pageInfo = pages[url];

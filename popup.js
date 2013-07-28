@@ -275,7 +275,11 @@ var initPopup = function () {
                 $('#title').val(tab.title);
                 copySel2desc();
                 $('#tags').val('');
-                $('#private').attr('checked', false);
+                if (localStorage[allprivateKey] === 'true') {
+                    $('#private').attr('checked', true);
+                } else {
+                    $('#private').attr('checked', false);
+                }
                 $('#toread').attr('checked', false);
                 $('.alert').hide();
                 $('#delete').hide();
