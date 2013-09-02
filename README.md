@@ -25,6 +25,7 @@ Contributors
 - [concept47](https://github.com/concept47)
 - [seansay](https://github.com/seansay)
 - [Ian Langworth ☠](https://github.com/statico)
+- [Tamim Swaid](https://twitter.com/tamimat)
 
 Donate
 ------
