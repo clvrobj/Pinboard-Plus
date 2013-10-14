@@ -239,7 +239,7 @@ var deletePost = function (url) {
 var getSuggest = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        var path = mainPath + 'posts/suggest?url=' + url,
+        var path = mainPath + 'posts/suggest?format=json&url=' + url,
         jqxhr = $.ajax({url: path,
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
@@ -249,14 +249,18 @@ var getSuggest = function (url) {
                         headers: {'Authorization': makeUserAuthHeader()}
                     });
         jqxhr.always(function (data) {
-                         var res = $.makeArray($(data.responseXML).find('recommended')).concat(
-                             $.makeArray($(data.responseXML).find('recommended'))),
-                         suggests = [];
-                         for (var i=0, len = res.length; i<len && i<=5; i++) {
-                             suggests.push($(res[i]).text());
-                         }
-                         var popup = chrome.extension.getViews({type: 'popup'})[0];
-                         popup && popup.renderSuggests(suggests);
+                        var popularTags = data[0].popular;
+                        var recommendedTags = data[1].recommended;
+
+                        // default to popluar tags, add new recommended tags
+                        var suggests = popularTags.slice();
+                        var popup = chrome.extension.getViews({type: 'popup'})[0];
+                        $.each(recommendedTags, function(index, tag){
+                          if(popularTags.indexOf(tag) === -1){
+                            suggests.push(tag);
+                          }
+                        });
+                        popup && popup.renderSuggests(suggests);
                      });
     }
 };
