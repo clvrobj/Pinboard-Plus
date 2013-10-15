@@ -50,7 +50,7 @@ var copySel2desc = function () {
             chrome.tabs.sendRequest(
                 tab.id, {method: "getSelection"},
                 function (response) {
-                    if (response.data.length !== 0) {
+                    if (typeof response !== 'undefined' && response.data.length !== 0) {
                         $('#desc').val('<blockquote>' + response.data + '</blockquote>');
                         $('#blockquote-hint').show();
                     }
