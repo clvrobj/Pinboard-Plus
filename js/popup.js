@@ -1,4 +1,34 @@
-var bg = chrome.extension.getBackgroundPage(), curTabUrl = '', tags = [];
+var app = angular.module('popupApp', []),
+bg = chrome.extension.getBackgroundPage();
+
+var PopupCtrl = function ($scope) {
+
+    $scope.openUrl = function (url) {
+        chrome.tabs.create({url: url});
+        var popup = chrome.extension.getViews({type: 'popup'})[0];
+        popup && popup.close();
+    };
+
+    var userInfo = bg.getUserInfo();
+    $scope.userInfo = userInfo;
+    $scope.isAnony = !userInfo || !userInfo.isChecked;
+    $scope.isLoading = false;
+    $scope.loadingText = 'Loading...';
+
+    if ($scope.isAnony) {
+        $scope.isLoginError = false;
+        $scope.loginSubmit = function () {
+            $scope.loadingText = 'Logging in...';
+            $scope.isLoading = true;
+            bg.login(this.username, this.password);
+        };
+    }
+
+};
+
+app.controller('PopupCtrl', PopupCtrl);
+
+var curTabUrl = '', tags = [];
 var keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80};
 
 var SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
@@ -64,7 +94,7 @@ var renderPageInfo = function (pageInfo) {
         hideLoading();
         if (pageInfo.isSaved) {
             bg.getSuggest(pageInfo.url);
-            $('#user').text(userInfo.name);
+            // $('#user').text(userInfo.name);
             pageInfo.url && $('#url').val(pageInfo.url);
             pageInfo.title && $('#title').val(pageInfo.title);
             pageInfo.desc ? $('#desc').val(pageInfo.desc) : copySel2desc();
@@ -90,7 +120,7 @@ var renderPageInfo = function (pageInfo) {
         } else {
             initPopup();
         }
-        resume_autocomplete_suggest();
+        // resume_autocomplete_suggest();
     }
 };
 
@@ -114,53 +144,50 @@ var checkLogin = function () {
     }
 };
 
-var showLoading = function (content) {
-    var mask = $('#state-mask');
-    mask.html(content || 'Loading...');
-    mask.show();
-},
-hideLoading = function () {
-    $('#state-mask').hide();
-};
+// var showLoading = function (content) {
+//     var mask = $('#state-mask');
+//     mask.html(content || 'Loading...');
+//     mask.show();
+// },
+// hideLoading = function () {
+//     $('#state-mask').hide();
+// };
 
-var showLoginWindow = function () {
-    hideLoading();
-    $('.logo-unlogin').show();
-    $('#login-window').show();
-    $('#login-error').hide();
-    var submit = function () {
-        showLoading('Logging in...');
-        var name = $('#login-window #username').val(),
-        pwd = $('#login-window #password').val();
-        bg.login(name, pwd);
-    };
-    $('#login-window #username').unbind('keypress').keypress(
-        function (e) {
-            var code = e.keyCode || e.which;
-            if(code == keyCode.enter) {
-                submit();
-            }
-        });
-    $('#login-window #password').unbind('keypress').keypress(
-        function (e) {
-            var code = e.keyCode || e.which;
-            if(code == keyCode.enter) {
-                submit();
-            }
-        });
-    $('#login-window #login').unbind('click').click(submit);
-},
-hideLoginWindow = function () {
-    $('.logo-unlogin').hide();
-    $('#login-window').hide();
-};
+// var showLoginWindow = function () {
+//     hideLoading();
+//     $('#login-window').show();
+//     var submit = function () {
+//         showLoading('Logging in...');
+//         var name = $('#login-window #username').val(),
+//         pwd = $('#login-window #password').val();
+//         bg.login(name, pwd);
+//     };
+//     $('#login-window #username').unbind('keypress').keypress(
+//         function (e) {
+//             var code = e.keyCode || e.which;
+//             if(code == keyCode.enter) {
+//                 submit();
+//             }
+//         });
+//     $('#login-window #password').unbind('keypress').keypress(
+//         function (e) {
+//             var code = e.keyCode || e.which;
+//             if(code == keyCode.enter) {
+//                 submit();
+//             }
+//         });
+//     $('#login-window #login').unbind('click').click(submit);
+// },
+// hideLoginWindow = function () {
+//     $('#login-window').hide();
+// };
 
-var stop_autocomplete_suggest = function (o) {
-    $('#tag').die('keyup keydown');
-},
-resume_autocomplete_suggest = function (o) {
-    $('#tag').live('keyup keydown');
-};
+// var stop_autocomplete_suggest = function (o) {
+//     $('#tag').die('keyup keydown');
+// },
+// resume_autocomplete_suggest = function (o) {
+//     $('#tag').live('keyup keydown');
+// };
 
 var init_autocomplete_suggest = function (o) {
     // auto complete
@@ -193,7 +220,7 @@ var init_autocomplete_suggest = function (o) {
         }
         return false;
     };
-    $(o).live(
+    $(o).on(
         'keyup',
         function (e) {
             if (processKey(e)) return;
@@ -221,7 +248,7 @@ var init_autocomplete_suggest = function (o) {
             }
         });
 
-    $(o).live('keydown', function (e) {
+    $(o).on('keydown', function (e) {
                   var code = e.charCode? e.charCode : e.keyCode;
                   if (code && code == keyCode.enter &&
                       suggestsBox.find('.active').length == 0 || suggestsBox.is(':hidden')) {
@@ -267,8 +294,8 @@ var init_autocomplete_suggest = function (o) {
 var initPopup = function () {
     var userInfo = checkLogin();
     if (userInfo) {
-        $('#user').text(userInfo.name);
-        $('#logo-link').unbind('click').click(function () {openUrl('https://pinboard.in/');});
+        // $('#user').text(userInfo.name);
+        // $('#logo-link').unbind('click').click(function () {openUrl('https://pinboard.in/');});
         chrome.tabs.getSelected(
             null, function (tab) {
                 $('#url').val(tab.url);
@@ -300,7 +327,7 @@ $(function () {
       }
       $('#add-post-form').submit(
           function () {
-              stop_autocomplete_suggest();
+              // stop_autocomplete_suggest();
               showLoading('Saving...');
               var info = {},
               url = $('#url').val(), title = $('#title').val(),

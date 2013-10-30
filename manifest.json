@@ -1,13 +1,13 @@
 {
   "name": "Pinboard Plus",
-  "version": "1.15",
+  "version": "2.0",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "browser_action": {
      "default_title": "Pinboard Plus",
      "default_icon": "/img/icon_grey_19.png",
-     "default_popup": "popup.html",
+     "default_popup": "/templates/popup.html",
      "icons": ["/img/icon_grey_19.png", "/img/icon_colored_19.png", "/img/icon_grey_saving_19.png"]
   },
   "permissions": [
@@ -16,12 +16,12 @@
     "https://*/*"
   ],
   "background": {
-    "page": "background.html"
+    "page": "/templates/background.html"
   },
   "content_scripts": [{
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["selection.js"],
+      "js": ["/js/selection.js"],
       "all_frames": true
     }],
   "icons": {
@@ -29,7 +29,7 @@
     "48": "/img/appicon_48.png",
     "128": "/img/appicon_128.png"
   },
-  "options_page": "options.html",
+  "options_page": "/templates/options.html",
   "commands": {
      "_execute_browser_action": {
        "suggested_key": {
