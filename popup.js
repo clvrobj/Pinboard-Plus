@@ -338,5 +338,5 @@ $(function () {
 
       init_autocomplete_suggest($('#tag'));
 
-      $('#tag').focus();
+      if (location.search != "?focusHack") location.search = "?focusHack";
   });
