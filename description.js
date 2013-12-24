@@ -13,7 +13,5 @@ chrome.extension.onRequest.addListener(
             }
             sendResponse({data: description});
         }
-        else {
-            sendResponse({});
-        }
-    });
+    }
+);
