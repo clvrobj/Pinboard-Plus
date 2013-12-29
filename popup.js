@@ -44,11 +44,11 @@ var renderSuggests = function (suggests) {
     }
 };
 
-var copySel2desc = function () {
+var copySelOrMetaToDesc = function () {
     chrome.tabs.getSelected(
         null, function(tab) {
             chrome.tabs.sendRequest(
-                tab.id, {method: "getSelection"},
+                tab.id, {method: "getDescription"},
                 function (response) {
                     if (typeof response !== 'undefined' && response.data.length !== 0) {
                         $('#desc').val('<blockquote>' + response.data + '</blockquote>');
@@ -67,7 +67,7 @@ var renderPageInfo = function (pageInfo) {
             $('#user').text(userInfo.name);
             pageInfo.url && $('#url').val(pageInfo.url);
             pageInfo.title && $('#title').val(pageInfo.title);
-            pageInfo.desc ? $('#desc').val(pageInfo.desc) : copySel2desc();
+            pageInfo.desc ? $('#desc').val(pageInfo.desc) : copySelOrMetaToDesc();
             pageInfo.tag && $('#tag').val(pageInfo.tag.concat(' '));
             $('#private').attr('checked', !pageInfo.shared);
             $('#toread').attr('checked', pageInfo.toread);
@@ -273,7 +273,7 @@ var initPopup = function () {
             null, function (tab) {
                 $('#url').val(tab.url);
                 $('#title').val(tab.title);
-                copySel2desc();
+                copySelOrMetaToDesc();
                 $('#tags').val('');
                 if (localStorage[allprivateKey] === 'true') {
                     $('#private').attr('checked', true);
