@@ -106,13 +106,13 @@ ul .item-title {
 
 .alert {
     display: none;
-    margin-left: 5px;
+    margin: auto 5px;
     color: #333;
     background: #CED;
     float: left;
     padding: 3px;
     padding-top: 1px;
-    width: 60%;
+    width: 55%;
     border: 1px solid #ACC;
 }
 
