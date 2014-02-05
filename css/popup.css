@@ -1,3 +1,7 @@
+html {
+    height: 320px;
+}
+
 body {
     width: 480px;
     height: 305px;
@@ -52,7 +56,6 @@ ul .item-title {
 }
 
 #login-window {
-    /* display: none; */
     position: absolute;
     width: 100%;
     height: 240px;
@@ -100,7 +103,6 @@ ul .item-title {
 }
 
 .alert {
-    display: none;
     margin-left: 5px;
     color: #333;
     background: #CED;
@@ -109,10 +111,6 @@ ul .item-title {
     padding-top: 1px;
     width: 60%;
     border: 1px solid #ACC;
-}
-
-#delete {
-    display: none;
 }
 
 .auto-complete {
@@ -143,7 +141,6 @@ ul .item-title {
 }
 
 #blockquote-hint {
-    display: none;
     color: #BEBEBE;
     margin: 2px 0 0;
 }
