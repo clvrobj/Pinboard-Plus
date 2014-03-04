@@ -5,7 +5,7 @@ app.controller(
     ['$rootScope', '$scope', '$window',
      function($rootScope, $scope, $window) {
          var bg = chrome.extension.getBackgroundPage(),
-             keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80},
+             keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80, space:32},
              SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
          Date.prototype.getTimePassed = function () {
              var ret = {day: 0, hour: 0, min: 0, sec: 0, offset: -1},
@@ -53,7 +53,11 @@ app.controller(
                                function (response) {
                                    if (typeof response !== 'undefined' &&
                                        response.data.length !== 0) {
-                                       $scope.pageInfo.desc = '<blockquote>' + response.data +
+                                       var desc = response.data;
+                                       if (desc.length > maxDescLen) {
+                                           desc = desc.slice(0, maxDescLen) + '...'
+                                       }
+                                       $scope.pageInfo.desc = '<blockquote>' + desc +
                                            '</blockquote>';
                                        $scope.isQuoteHintShown = true;
                                        $scope.$apply();
@@ -102,7 +106,7 @@ app.controller(
              var code = e.charCode? e.charCode : e.keyCode;
              if (code &&
                  _.indexOf([keyCode.enter, keyCode.tab, keyCode.up, keyCode.down,
-                            keyCode.n, keyCode.p, keyCode.ctrl],
+                            keyCode.n, keyCode.p, keyCode.ctrl, keyCode.space],
                            code) >= 0) {
                  if (code == keyCode.enter || code == keyCode.tab) {
                      if ($scope.isShowAutoComplete) {
@@ -146,6 +150,8 @@ app.controller(
                                });
                      $scope.activeItemIndex = idx;
                      $scope.autoCompleteItems[idx].isActive = true;
+                 } else if (code == keyCode.space) {
+                     $scope.isShowAutoComplete = false;
                  }
              }
          };
@@ -225,6 +231,7 @@ app.controller(
              info.shared = $scope.pageInfo.isPrivate ? 'no' : 'yes';
              info.toread = $scope.pageInfo.toread ? 'yes' : 'no';
              bg.addPost(info);
+             window.close();
          };
 
          $scope.showDeleteConfirm = function () {

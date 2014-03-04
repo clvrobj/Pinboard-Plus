@@ -176,9 +176,13 @@ var updateSelectedTabExtIcon = function () {
 var addPost = function (info) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && info.url && info.title) {
+        var desc = info.desc;
+        if (desc.length > maxDescLen) {
+            desc = desc.slice(0, maxDescLen) + '...'
+        }
         var path = mainPath + 'posts/add',
             data = {description: info.title, url: info.url,
-                    extended: info.desc, tags: info.tag, format: 'json'};
+                    extended: desc, tags: info.tag, format: 'json'};
         info.shared && (data['shared'] = info.shared);
         info.toread && (data['toread'] = info.toread);
         var jqxhr = $.ajax({url: path,
@@ -201,12 +205,8 @@ var addPost = function (info) {
             }
             updateSelectedTabExtIcon();
             queryPinState({url: info.url, isForce: true});
-            var popup = chrome.extension.getViews({type: 'popup'})[0];
-            popup && popup.close();
         });
         jqxhr.fail(function (data) {});
-        var popup = chrome.extension.getViews({type: 'popup'})[0];
-        popup && popup.close();
         // change icon state
         pages[info.url] = {isSaving: true};
         updateSelectedTabExtIcon();
