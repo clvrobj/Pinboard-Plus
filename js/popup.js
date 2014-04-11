@@ -227,7 +227,7 @@ app.controller(
          $scope.postSubmit = function () {
              $scope.isLoading = true;
              $scope.loadingText = 'Saving...';
-             var info = $scope.pageInfo;
+             var info = _.clone($scope.pageInfo);
              info.shared = $scope.pageInfo.isPrivate ? 'no' : 'yes';
              info.toread = $scope.pageInfo.toread ? 'yes' : 'no';
              bg.addPost(info);
