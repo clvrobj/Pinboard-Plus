@@ -57,8 +57,10 @@ app.controller(
                                        if (desc.length > maxDescLen) {
                                            desc = desc.slice(0, maxDescLen) + '...'
                                        }
-                                       $scope.pageInfo.desc = '<blockquote>' + desc +
-                                           '</blockquote>';
+                                       if (localStorage[useblockquoteKey] === 'true') {
+                                           desc = '<blockquote>' + desc + '</blockquote>';
+                                       }
+                                       $scope.pageInfo.desc = desc;
                                        $scope.isQuoteHintShown = true;
                                        $scope.$apply();
                                    }
