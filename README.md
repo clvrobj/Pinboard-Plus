@@ -26,6 +26,7 @@ Contributors
 - [seansay](https://github.com/seansay)
 - [Ian Langworth ☠](https://github.com/statico)
 - [Tamim Swaid](https://twitter.com/tamimat)
+- [Sean Leather](https://github.com/spl)
 
 Donate
 ------
