@@ -28,3 +28,7 @@ span.checkbox {
 .meta {
   color: #999;
 }
+
+p {
+    height: 25px;
+}
