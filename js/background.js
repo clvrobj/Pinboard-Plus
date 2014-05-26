@@ -228,7 +228,7 @@ var deletePost = function (url) {
                            });
         jqxhr.always(function (data) {
             var resCode = data.result_code;
-            if (resCode == 'done') {
+            if (resCode == 'done' || resCode == 'item not found') {
                 delete pages[url];
                 updateSelectedTabExtIcon();
             } else {
