@@ -1,4 +1,4 @@
-var isUseBlockquote = function () {
-    var noUseBlockquote = localStorage[nouseblockquoteKey];
-    return typeof noUseBlockquote == 'undefined' || noUseBlockquote === 'false';
+var isBlockquote = function () {
+    var noBlockquote = localStorage[noblockquoteKey];
+    return typeof noBlockquote == 'undefined' || noBlockquote === 'false';
 };

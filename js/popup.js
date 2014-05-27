@@ -57,7 +57,7 @@ app.controller(
                                        if (desc.length > maxDescLen) {
                                            desc = desc.slice(0, maxDescLen) + '...'
                                        }
-                                       if (isUseBlockquote()) {
+                                       if (isBlockquote()) {
                                            desc = '<blockquote>' + desc + '</blockquote>';
                                        }
                                        $scope.pageInfo.desc = desc;
