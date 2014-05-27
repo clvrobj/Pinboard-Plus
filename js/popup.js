@@ -59,9 +59,9 @@ app.controller(
                                        }
                                        if (isBlockquote()) {
                                            desc = '<blockquote>' + desc + '</blockquote>';
+                                           $scope.isQuoteHintShown = true;
                                        }
                                        $scope.pageInfo.desc = desc;
-                                       $scope.isQuoteHintShown = true;
                                        $scope.$apply();
                                    }
                                });
