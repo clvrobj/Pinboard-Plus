@@ -94,12 +94,7 @@ ul .item-title {
 }
 
 #header .random {
-    margin: 0 0 0 5px;
-    color: #FFF;
-}
-
-#header .random:hover {
-    color: #AAA;
+    color: #BBB;
 }
 
 .alert {
