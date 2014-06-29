@@ -13,15 +13,14 @@
             <form id="login-form" ng-submit="loginSubmit()">
                 <ul>
                     <li id="login-error" ng-show="isLoginError">
-                        <span style="color:red;">Login failed.</span>
+                        <span style="color:red;">Login Failed.</span>
                     </li>
                     <li>
-                        <span style="width: 60px;display: inline-block;">username:</span>
-                        <input id="username" name="username" type="text" size="20" ng-model="userLogin.name"/>
-                    </li>
-                    <li>
-                        <span style="width: 60px;display: inline-block;">password:</span>
-                        <input id="password" name="password" type="password" size="20" ng-model="userLogin.passwd"/>
+                        <span style="width: 60px;display: inline-block;">API Token:</span>
+                        <input id="token" name="token" type="text" size="50" ng-model="userLogin.authToken" placeholder="API Token"/>
+                        <div class="meta">
+                            You can find API token on your <a href="#" title="Pinboard Password page" ng-click="openUrl('https://pinboard.in/settings/password')">Pinboard Password page</a>.
+                        </div>
                     </li>
                     <li>
                         <input id="login" type="submit" value="log in" style="margin-left: 60px" />

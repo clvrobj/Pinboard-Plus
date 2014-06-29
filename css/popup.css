@@ -63,6 +63,11 @@ ul .item-title {
     z-index: 10;
 }
 
+#login-window .meta {
+    margin: 5px 0 0 64px;
+    color: #999;
+}
+
 #header {
     height: 25px;
     color: #AAA;

@@ -249,9 +249,11 @@ app.controller(
          };
 
          $scope.loginSubmit = function () {
-             $scope.loadingText = 'Logging in...';
-             $scope.isLoading = true;
-             bg.login($scope.userLogin.name, $scope.userLogin.passwd);
+             if ($scope.userLogin.authToken) {
+                 $scope.loadingText = 'Logging in...';
+                 $scope.isLoading = true;
+                 bg.login($scope.userLogin.authToken);
+             }
          };
 
          $scope.logout = function () {

@@ -17,6 +17,7 @@ var logout = function () {
     localStorage.removeItem(checkedkey);
     localStorage.removeItem(namekey);
     localStorage.removeItem(pwdkey);
+    localStorage.removeItem(authTokenKey);
     localStorage.removeItem(nopingKey);
     var popup = chrome.extension.getViews({type: 'popup'})[0];
     popup && popup.$rootScope &&
@@ -27,35 +28,29 @@ var getUserInfo = function () {
     if (!_userInfo) {
         if (localStorage[checkedkey]) {
             _userInfo = {isChecked: localStorage[checkedkey],
+                         authToken: localStorage[authTokenKey],
                          name: localStorage[namekey],
                          pwd: localStorage[pwdkey]};
         } else {
-            _userInfo = {name: '', pwd: '', isChecked: false};
+            _userInfo = {isChecked: false, authToken: '',
+                         name: '', pwd: ''};
         }
     }
     return _userInfo;
 };
 
-NamedNodeMap.prototype.getAttrVal = function (attrName) {
-    var attr = this.getNamedItem(attrName);
-    if (attr) {
-        return attr.nodeValue;
-    }
-    return null;
-};
-
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 var getPageInfo = function (url) {
-    if (!url || url == 'chrome://newtab/' || localStorage[nopingKey] === 'true') {
+    if (!url || url.indexOf('chrome://') == 0 || localStorage[nopingKey] === 'true') {
         return {url: url, isSaved:false};
     }
     var pageInfo = pages[url];
     if (pageInfo) {
         return pageInfo;
-    } else { // download now
-        updatePageInfo(url);
     }
+    // download now
+    updatePageInfo(url);
     return null;
 };
 
@@ -72,27 +67,25 @@ var updatePageInfo = function (url) {
     queryPinState({url: url, ready: cb});
 };
 
-var login = function (name, pwd) {
+var login = function (token) {
     // test auth
-    var path = mainPath + 'posts/update',
+    var path = mainPath + 'user/api_token',
         popup = chrome.extension.getViews({type: 'popup'})[0],
         jqxhr = $.ajax({url: path,
-                        data: {format:'json'},
+                        data: {format:'json', auth_token: token},
                         type : 'GET',
                         timeout: REQ_TIME_OUT,
                         dataType: 'json',
                         crossDomain: true,
-                        contentType:'text/plain',
-                        headers: {'Authorization': makeBasicAuthHeader(name, pwd)}
+                        contentType:'text/plain'
                        });
     jqxhr.always(function (data) {
-        var resTime = data.update_time;
-        if (resTime) { // success
-            _userInfo.name = name;
-            _userInfo.pwd = pwd;
+        if (data.result) {
+            // success
+            _userInfo.authToken = token;
+            _userInfo.name = token.split(':')[0];
             _userInfo.isChecked = true;
-            localStorage[namekey] = name;
-            localStorage[pwdkey] = pwd;
+            localStorage[authTokenKey] = token;
             localStorage[checkedkey] = true;
             popup && popup.$rootScope &&
                 popup.$rootScope.$broadcast('login-succeed');
@@ -141,15 +134,19 @@ var queryPinState = function (info) {
         tQuery = setTimeout(function () {
                      isQuerying = false;
                  }, QUERY_INTERVAL);
-        var jqxhr = $.ajax({url: mainPath + 'posts/get',
-                            type : 'GET',
-                            data: {url: url, format: 'json'},
-                            //timeout: REQ_TIME_OUT,
-                            dataType: 'json',
-                            crossDomain: true,
-                            contentType:'text/plain',
-                            headers: {'Authorization': makeUserAuthHeader()}
-                           });
+        var settings = {url: mainPath + 'posts/get',
+                        type : 'GET',
+                        data: {url: url, format: 'json'},
+                        //timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'};
+        if (userInfo.authToken) {
+            settings.data.auth_token = userInfo.authToken;
+        } else {
+            settings.headers = {'Authorization': makeUserAuthHeader()};
+        }
+        var jqxhr = $.ajax(settings);
         jqxhr.always(handler);
         jqxhr.fail(function (data) {
             if (data.statusText == 'timeout') {
@@ -185,15 +182,19 @@ var addPost = function (info) {
                     extended: desc, tags: info.tag, format: 'json'};
         info.shared && (data['shared'] = info.shared);
         info.toread && (data['toread'] = info.toread);
-        var jqxhr = $.ajax({url: path,
-                            type : 'GET',
-                            timeout: REQ_TIME_OUT,
-                            dataType: 'json',
-                            crossDomain: true,
-                            data: data,
-                            contentType:'text/plain',
-                            headers: {'Authorization': makeUserAuthHeader()}
-                           });
+        var settings = {url: path,
+                        type : 'GET',
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        data: data,
+                        contentType:'text/plain'};
+        if (userInfo.authToken) {
+            settings.data.auth_token = userInfo.authToken;
+        } else {
+            settings.headers = {'Authorization': makeUserAuthHeader()};
+        }
+        var jqxhr = $.ajax(settings);
         jqxhr.always(function (data) {
             var resCode = data.result_code;
             if (resCode == 'done') {
@@ -217,15 +218,19 @@ var deletePost = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
         var path = mainPath + 'posts/delete';
-        var jqxhr = $.ajax({url: path,
-                            type : 'GET',
-                            timeout: REQ_TIME_OUT,
-                            dataType: 'json',
-                            crossDomain: true,
-                            data: {url: url, format: 'json'},
-                            contentType: 'text/plain',
-                            headers: {'Authorization': makeUserAuthHeader()}
-                           });
+        var settings = {url: path,
+                        type : 'GET',
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        data: {url: url, format: 'json'},
+                        contentType: 'text/plain'};
+        if (userInfo.authToken) {
+            settings.data.auth_token = userInfo.authToken;
+        } else {
+            settings.headers = {'Authorization': makeUserAuthHeader()};
+        }
+        var jqxhr = $.ajax(settings);
         jqxhr.always(function (data) {
             var resCode = data.result_code;
             if (resCode == 'done' || resCode == 'item not found') {
@@ -243,15 +248,20 @@ var deletePost = function (url) {
 var getSuggest = function (url) {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked && url) {
-        var path = mainPath + 'posts/suggest?format=json&url=' + url,
-            jqxhr = $.ajax({url: path,
-                            type : 'GET',
-                            timeout: REQ_TIME_OUT,
-                            dataType: 'json',
-                            crossDomain: true,
-                            contentType:'text/plain',
-                            headers: {'Authorization': makeUserAuthHeader()}
-                           });
+        var path = mainPath + 'posts/suggest';
+        var settings = {url: path,
+                        type : 'GET',
+                        data: {url: url, format: 'json'},
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'};
+        if (userInfo.authToken) {
+            settings.data.auth_token = userInfo.authToken;
+        } else {
+            settings.headers = {'Authorization': makeUserAuthHeader()};
+        }
+        var jqxhr = $.ajax(settings);
         jqxhr.always(function (data) {
             var popularTags = [], recommendedTags = [];
             if (data) {
@@ -278,15 +288,19 @@ var _getTags = function () {
     var userInfo = getUserInfo();
     if (userInfo && userInfo.isChecked) {
         var path = mainPath + 'tags/get',
-            jqxhr = $.ajax({url: path,
-                            type : 'GET',
-                            data: {format: 'json'},
-                            timeout: REQ_TIME_OUT,
-                            dataType: 'json',
-                            crossDomain: true,
-                            contentType:'text/plain',
-                            headers: {'Authorization': makeUserAuthHeader()}
-                           });
+            settings = {url: path,
+                        type : 'GET',
+                        data: {format: 'json'},
+                        timeout: REQ_TIME_OUT,
+                        dataType: 'json',
+                        crossDomain: true,
+                        contentType:'text/plain'};
+        if (userInfo.authToken) {
+            settings.data.auth_token = userInfo.authToken;
+        } else {
+            settings.headers = {'Authorization': makeUserAuthHeader()};
+        }
+        var jqxhr = $.ajax(settings);
         jqxhr.always(function (data) {
             if (data) {
                 _tags = _.sortBy(_.keys(data),
