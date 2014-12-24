@@ -43,6 +43,7 @@ ul .item-title {
 
 #suggest a {
     margin: 0 3px;
+    float: left;
 }
 
 #state-mask {
