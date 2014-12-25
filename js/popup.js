@@ -192,18 +192,18 @@ app.controller(
 
          $scope.$on('render-page-info', renderPageInfo);
 
-         $scope.addTags = function (tags) {
-            $.each(tags, function (index, tag) {
-                $scope.addTag(tag);
-            });
-         };
-
-         $scope.addTag = function (s) {
+         var addTag = function (s) {
              var t = $scope.pageInfo.tag;
              // skip if tag already added
              if ($.inArray(s, t.split(' ')) == -1) {
                  $scope.pageInfo.tag = t + ' ' + s;
              }
+         };
+
+         $scope.addTags = function (tags) {
+            $.each(tags, function (index, tag) {
+                addTag(tag);
+            });
          };
 
          $scope.$on('render-suggests', function (e, suggests) {

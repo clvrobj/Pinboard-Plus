@@ -46,6 +46,14 @@ ul .item-title {
     float: left;
 }
 
+#suggest a.selected {
+    color: #BEBEBE
+}
+
+#suggest a#add-all {
+    color: #888
+}
+
 #state-mask {
     position: absolute;
     width: 100%;
