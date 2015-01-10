@@ -1,3 +1,5 @@
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=clvrobj&url=http://github.com/clvrobj/Pinboard-Plus&title=Pinboard-Plus&language=&tags=github&category=software)
+
 Intro
 -----
 
