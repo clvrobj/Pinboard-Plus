@@ -83,6 +83,7 @@ app.controller(
                                  tag: '', desc: ''};
                      pageInfo.shared = (localStorage[allprivateKey] !== 'true');
                      pageInfo.isPrivate = !pageInfo.shared;
+                     pageInfo.toread = (localStorage[alltoreadKey] === 'true');
                      pageInfo.isSaved = false;
                  }
                  if (pageInfo.tag) {
