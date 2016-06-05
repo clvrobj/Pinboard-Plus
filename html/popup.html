@@ -65,7 +65,10 @@
                     <li>
                         <label class="item-title">Suggest</label>
                         <span id="suggest">
-                            <a href="#" ng-class="{'selected':pageInfo.tag.split(' ').indexOf(suggest) != -1}"
+                            <a href="#" ng-class="{
+                                   'selected': pageInfo.tag.split(' ').indexOf(suggest) != -1,
+                                   'preexisting': allTags.indexOf(suggest) != -1
+                                }"
                                ng-repeat="suggest in suggests" ng-click="addTags([suggest])">{{suggest}}</a>
                             <a href="#" id="add-all" ng-click="addTags(suggests)">Add all</a>
                         </span>
