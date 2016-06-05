@@ -69,7 +69,7 @@
                                    'selected': pageInfo.tag.split(' ').indexOf(suggest) != -1,
                                    'preexisting': allTags.indexOf(suggest) != -1
                                 }"
-                               ng-repeat="suggest in suggests" ng-click="addTags([suggest])">{{suggest}}</a>
+                               ng-repeat="suggest in suggests" ng-click="toggleTag(suggest)">{{suggest}}</a>
                             <a href="#" id="add-all" ng-click="addTags(suggests)">Add all</a>
                         </span>
                     </li>
