@@ -20,6 +20,13 @@ Install
 -------
 You can install in Chrome webstore: [Pinboard Plus](https://chrome.google.com/webstore/detail/mphdppdgoagghpmmhodmfajjlloijnbd)
 
+Development
+-----------
+Follow the official instruction to [load the extenstion](https://developer.chrome.com/extensions/getstarted#unpacked).
+
+For testing, add the `'unsafe-eval'` to script-src in the manifest, and open the `chrome-extension://[Extension ID]/tests/tests.html` in the browser.
+
+
 Contributors
 ------------
 - [clvrobj](https://github.com/clvrobj)
@@ -29,6 +36,8 @@ Contributors
 - [Ian Langworth ☠](https://github.com/statico)
 - [Tamim Swaid](https://twitter.com/tamimat)
 - [Sean Leather](https://github.com/spl)
+- [Andrew Martin](https://github.com/sublimino)
+- [Krzysztof Kosyl](https://github.com/kosqx) 
 
 Donate
 ------
