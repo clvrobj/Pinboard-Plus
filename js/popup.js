@@ -207,6 +207,16 @@ app.controller(
             });
          };
 
+         $scope.toggleTag = function (tag) {
+             var tags = $scope.pageInfo.tag.split(' ');
+             if (tags.indexOf(tag) === -1) {
+                 tags.push(tag);
+             } else {
+                 tags.splice(tags.indexOf(tag), 1);
+             }
+             $scope.pageInfo.tag = tags.join(' ');
+         };
+
          $scope.$on('render-suggests', function (e, suggests) {
              $scope.suggests = suggests;
              $scope.$apply();

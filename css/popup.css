@@ -50,6 +50,10 @@ ul .item-title {
     color: #BEBEBE
 }
 
+#suggest a.preexisting {
+    text-decoration: underline;
+}
+
 #suggest a#add-all {
     color: #888
 }
