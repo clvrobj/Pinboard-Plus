@@ -10,6 +10,12 @@ $(function() {
         var value = $(this).is(':checked');
         localStorage[allprivateKey] = value;
     });
+    $('#private-when-incognito').attr('checked', localStorage[privateWhenIncognitoKey] === 'true')
+    .click(function () {
+        var value = $(this).is(':checked');
+        localStorage[privateWhenIncognitoKey] = value;
+    });
+
     $('#all-toread').attr('checked', localStorage[alltoreadKey] === 'true')
     .click(function () {
         var value = $(this).is(':checked');

@@ -15,6 +15,8 @@ Features:
 
 * Same UI style with Pinboard official site.
 
+* Set 'private' if in Incognito Mode
+
 
 Install
 -------
