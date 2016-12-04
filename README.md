@@ -1,5 +1,3 @@
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=clvrobj&url=http://github.com/clvrobj/Pinboard-Plus&title=Pinboard-Plus&language=&tags=github&category=software)
-
 Intro
 -----
 
@@ -10,11 +8,8 @@ Easy to know current page has been saved or not.
 Features:
 
 * Icon changing to show current page has been saved or not.
-
 * Delete bookmark from the popup window.
-
 * Same UI style with Pinboard official site.
-
 * Set 'private' if in Incognito Mode
 
 
@@ -39,10 +34,5 @@ Contributors
 - [Tamim Swaid](https://twitter.com/tamimat)
 - [Sean Leather](https://github.com/spl)
 - [Andrew Martin](https://github.com/sublimino)
-- [Krzysztof Kosyl](https://github.com/kosqx) 
-
-Donate
-------
-If you think Pinboard Plus is helpful, [please donate](https://www.gittip.com/clvrobj/), thanks!
-
-<https://www.gittip.com/clvrobj/>
+- [Krzysztof Kosyl](https://github.com/kosqx)
+- [Moritz U.](https://github.com/the-kenny)
