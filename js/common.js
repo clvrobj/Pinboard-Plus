@@ -12,6 +12,8 @@ allprivateKey = keyPrefix + 'allprivate',
 alltoreadKey = keyPrefix + 'alltoread',
 // config in the settings for wrapping text with <blockquote>
 noblockquoteKey = keyPrefix + 'noblockquote',
+// config in the settings for enabling 'private' when in incognito mode
+privateWhenIncognitoKey = keyPrefix + 'privatewhenincognito',
 
 mainPath = 'https://api.pinboard.in/v1/',
 

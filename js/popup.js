@@ -81,7 +81,8 @@ app.controller(
                  if (!pageInfo || pageInfo.isSaved == false) {
                      pageInfo = {url: tab.url, title: tab.title,
                                  tag: '', desc: ''};
-                     pageInfo.shared = (localStorage[allprivateKey] !== 'true');
+                     pageInfo.shared = (localStorage[allprivateKey] !== 'true')
+                       && !((localStorage[privateWhenIncognitoKey] === 'true') && tab.incognito);
                      pageInfo.isPrivate = !pageInfo.shared;
                      pageInfo.toread = (localStorage[alltoreadKey] === 'true');
                      pageInfo.isSaved = false;
