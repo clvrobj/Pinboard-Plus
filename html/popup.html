@@ -60,7 +60,7 @@
                     </li>
                     <li>
                         <label class="item-title">Tags</label>
-                        <input id="tag" type="text" style="width:420px" autofocus="autofocus" autocomplete="off" ng-model="pageInfo.tag" ng-change="showAutoComplete()" ng-keydown="chooseTag($event)"/>
+                        <input id="tag" type="text" style="width:420px" autofocus="autofocus" autocomplete="off" ng-model="pageInfo.tag" ng-change="showAutoComplete()" ng-keydown="chooseTag($event)" ng-blur="isShowAutoComplete=false"/>
                     </li>
                     <li>
                         <label class="item-title">Suggest</label>
