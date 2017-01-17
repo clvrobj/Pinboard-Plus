@@ -45,6 +45,13 @@ app.controller(
              $scope.$apply();
          });
 
+         $scope.$on('error', function (e, errorText) {
+             $scope.isLoading = false;
+             $scope.isError = true;
+             $scope.errorText = errorText || 'Something wrong ...';
+             $scope.$apply();
+         });
+
          var copySelOrMetaToDesc = function () {
              chrome.tabs.getSelected(
                  null, function(tab) {

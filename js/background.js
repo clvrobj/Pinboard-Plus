@@ -1,6 +1,10 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
 var pages = {}, _userInfo;
 
+var getPopup = function () {
+    return chrome.extension.getViews({type: 'popup'})[0];
+};
+
 var makeBasicAuthHeader = function(user, password) {
     var tok = user + ':' + password;
     var hash = btoa(tok);
@@ -19,7 +23,7 @@ var logout = function () {
     localStorage.removeItem(pwdkey);
     localStorage.removeItem(authTokenKey);
     localStorage.removeItem(nopingKey);
-    var popup = chrome.extension.getViews({type: 'popup'})[0];
+    var popup = getPopup();
     popup && popup.$rootScope &&
         popup.$rootScope.$broadcast('logged-out');
 };
@@ -56,10 +60,11 @@ var getPageInfo = function (url) {
 
 // refresh page info even page info has fetched from server
 var updatePageInfo = function (url) {
-    var popup = chrome.extension.getViews({type: 'popup'})[0];
+    var popup = getPopup();
     popup && popup.$rootScope &&
         popup.$rootScope.$broadcast('show-loading', 'Loading bookmark...');
     var cb = function (pageInfo) {
+        var popup = getPopup();
         popup && popup.$rootScope &&
             popup.$rootScope.$broadcast('render-page-info', pageInfo);
         updateSelectedTabExtIcon();
@@ -67,10 +72,20 @@ var updatePageInfo = function (url) {
     queryPinState({url: url, ready: cb});
 };
 
+var handleError = function (data) {
+    var popup = getPopup();
+    if (data.status == 0 || data.statusText == 'error'){
+        popup && popup.$rootScope &&
+            popup.$rootScope.$broadcast('error', 'Error, please check your connection.');
+    } else {
+        popup && popup.$rootScope &&
+            popup.$rootScope.$broadcast('error', 'Error, Pinboard API is probably down.');
+    }
+};
+
 var login = function (token) {
     // test auth
     var path = mainPath + 'user/api_token',
-        popup = chrome.extension.getViews({type: 'popup'})[0],
         jqxhr = $.ajax({url: path,
                         data: {format:'json', auth_token: token},
                         type : 'GET',
@@ -79,12 +94,14 @@ var login = function (token) {
                         crossDomain: true,
                         contentType:'text/plain'
                        });
-    jqxhr.always(function (data) {
+    jqxhr.done(function (data) {
+        var popup = getPopup();
         if (data.result) {
             // success
             _userInfo.authToken = token;
             _userInfo.name = token.split(':')[0];
             _userInfo.isChecked = true;
+            localStorage[namekey] = token.split(':')[0];
             localStorage[authTokenKey] = token;
             localStorage[checkedkey] = true;
             popup && popup.$rootScope &&
@@ -92,14 +109,18 @@ var login = function (token) {
             _getTags();
         } else {
             // login error
+            var popup = getPopup();
             popup && popup.$rootScope &&
                 popup.$rootScope.$broadcast('login-failed');
         }
     });
     jqxhr.fail(function (data) {
-        if (data.statusText == 'timeout') {
+        var popup = getPopup();
+        if (data.status == 401 || data.status == 500) {
             popup && popup.$rootScope &&
                 popup.$rootScope.$broadcast('login-failed');
+        } else {
+            handleError(data);
         }
     });
 };
@@ -147,12 +168,8 @@ var queryPinState = function (info) {
             settings.headers = {'Authorization': makeUserAuthHeader()};
         }
         var jqxhr = $.ajax(settings);
-        jqxhr.always(handler);
-        jqxhr.fail(function (data) {
-            if (data.statusText == 'timeout') {
-                delete pages[url];
-            }
-        });
+        jqxhr.done(handler);
+        jqxhr.fail(handleError);
     }
 };
 
@@ -195,21 +212,31 @@ var addPost = function (info) {
             settings.headers = {'Authorization': makeUserAuthHeader()};
         }
         var jqxhr = $.ajax(settings);
-        jqxhr.always(function (data) {
+        jqxhr.done(function (data) {
             var resCode = data.result_code;
-            if (resCode == 'done') {
-                // done
-                pages[info.url] = {isSaved: true};
+            if (pages[info.url]) {
+                pages[info.url].isSaved = resCode == 'done' ? true : false;
             } else {
-                // error
-                pages[info.url] = {isSaved: false};
+                pages[info.url] = {isSaved: resCode == 'done' ? true : false};
             }
             updateSelectedTabExtIcon();
             queryPinState({url: info.url, isForce: true});
+            var popup = getPopup();
+            popup && popup.close();
         });
-        jqxhr.fail(function (data) {});
+        jqxhr.fail(function (data) {
+            if (pages[info.url]) {
+                pages[info.url].isSaved = false;
+            } else {
+                pages[info.url] = {isSaved: false};
+            }
+        });
         // change icon state
-        pages[info.url] = {isSaving: true};
+        if (pages[info.url]) {
+            pages[info.url].isSaving = true;
+        } else {
+            pages[info.url] = {isSaving: true};
+        }
         updateSelectedTabExtIcon();
     }
 };
@@ -231,17 +258,21 @@ var deletePost = function (url) {
             settings.headers = {'Authorization': makeUserAuthHeader()};
         }
         var jqxhr = $.ajax(settings);
-        jqxhr.always(function (data) {
+        jqxhr.done(function (data) {
             var resCode = data.result_code;
             if (resCode == 'done' || resCode == 'item not found') {
                 delete pages[url];
                 updateSelectedTabExtIcon();
             } else {
                 // error
+                var popup = getPopup();
+                popup && popup.$rootScope &&
+                    popup.$rootScope.$broadcast('error');
             }
-            var popup = chrome.extension.getViews({type: 'popup'})[0];
+            var popup = getPopup();
             popup && popup.close();
         });
+        jqxhr.fail(handleError);
     }
 };
 
@@ -264,7 +295,7 @@ var getSuggest = function (url) {
         var jqxhr = $.ajax(settings);
         jqxhr.always(function (data) {
             var popularTags = [], recommendedTags = [];
-            if (data) {
+            if (data && data.length > 0) {
                 popularTags = data[0].popular;
                 recommendedTags = data[1].recommended;
             }
@@ -275,7 +306,7 @@ var getSuggest = function (url) {
                     suggests.push(tag);
                 }
             });
-            var popup = chrome.extension.getViews({type: 'popup'})[0];
+            var popup = getPopup();
             popup && popup.$rootScope &&
                 popup.$rootScope.$broadcast('render-suggests', suggests);
         });

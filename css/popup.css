@@ -68,6 +68,17 @@ ul .item-title {
     z-index: 20;
 }
 
+#error-info-bar {
+    position: absolute;
+    width: 100%;
+    height: 25px;
+    margin: 0 95px;
+    color: red;
+    background-color: #FFF;
+    opacity: 0.8;
+    z-index: 30;
+}
+
 #login-window {
     position: absolute;
     width: 100%;

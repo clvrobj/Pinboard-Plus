@@ -5,7 +5,10 @@
     </head>
     <body ng-controller="PopupCtrl">
         <div id="state-mask" ng-show="isLoading">{{loadingText}}</div>
-
+        <div id="error-info-bar" ng-show="isError">
+          <span>{{errorText}}</span>&nbsp;
+          <a href="#" title="Hide error info" ng-click="isError=false">x</a>
+        </div>
         <div id="login-window" ng-show="isAnony">
             <div id="header">
                 <div class="logo-unlogin">Pinboard - please login</div>
@@ -13,7 +16,7 @@
             <form id="login-form" ng-submit="loginSubmit()">
                 <ul>
                     <li id="login-error" ng-show="isLoginError">
-                        <span style="color:red;">Login Failed.</span>
+                        <span style="color:red;">Login Failed. The token format is user:TOKEN.</span>
                     </li>
                     <li>
                         <span style="width: 60px;display: inline-block;">API Token:</span>
