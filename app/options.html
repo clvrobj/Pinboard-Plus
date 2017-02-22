@@ -1,0 +1,46 @@
+<head>
+  <title>Pinboard Plus Options</title>
+  <!-- build:css styles/options.css -->
+  <link href="styles/options.css" rel="stylesheet" type="text/css">
+  <!-- endbuild -->
+  <!-- build:js scripts/options.js -->
+  <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="scripts/common.js"></script>
+  <script type="text/javascript" src="scripts/utils.js"></script>
+  <script type="text/javascript" src="scripts/options.js"></script>
+  <!-- endbuild -->
+</head>
+<body>
+  <header>
+    <h1>
+      <img src="images/appicon_48.png"/>
+      Pinboard Plus Options
+    </h1>
+  </header>
+  <section>
+    <p>
+      <span class="checkbox"><input type="checkbox" id="no-ping" /></span>
+      <label for="no-ping">Do not check if page has already been bookmarked</label>
+      <br/>
+      <span class="meta">
+        (Stop pinging the Pinboard API; Icon will be grey)
+      </span>
+    </p>
+    <p>
+      <span class="checkbox"><input type="checkbox" id="all-private" /></span>
+      <label for="all-private">Private checkbox checked by default</label>
+    </p>
+    <p>
+      <span class="checkbox"><input type="checkbox" id="private-when-incognito" /></span>
+      <label for="private-when-incognito">Private checkbox checked when in Incognito Mode</label>
+    </p>
+    <p>
+      <span class="checkbox"><input type="checkbox" id="all-toread" /></span>
+      <label for="all-toread">"To read" checkbox checked by default</label>
+    </p>
+    <p>
+      <span class="checkbox"><input type="checkbox" id="use-blockquote" /></span>
+      <label for="use-blockquote">Wrap selected text on a page with <code>&lt;blockquote&gt;</code> in the Notes field</label>
+    </p>
+  </section>
+</body>

@@ -1,38 +1,44 @@
-Intro
------
-
+Pinboard Plus
+=============
 Pinboard Plus is a better Chrome extension for [Pinboard.in](http://pinboard.in). 
 
 Easy to know current page has been saved or not.
 
-Features:
+Features
+--------
 
-* Icon changing to show current page has been saved or not.
-* Delete bookmark from the popup window.
-* Same UI style with Pinboard official site.
-* Set 'private' if in Incognito Mode
+* Icon changing to show current page has been saved or not
+* Add, modify and delete bookmarks from the popup window
+* Same UI style with Pinboard official site
+* Set `private` if in Incognito Mode
 
 
-Install
--------
+Installation
+------------
 You can install in Chrome webstore: [Pinboard Plus](https://chrome.google.com/webstore/detail/mphdppdgoagghpmmhodmfajjlloijnbd)
 
 Development
 -----------
+Install dependencies:
+
+```bash
+$ npm install
+```
+
 Follow the official instruction to [load the extenstion](https://developer.chrome.com/extensions/getstarted#unpacked).
 
-For testing, add the `'unsafe-eval'` to script-src in the manifest, and open the `chrome-extension://[Extension ID]/tests/tests.html` in the browser.
+LiveReload:
 
+```bash
+$ gulp watch
+```
 
-Contributors
-------------
-- [clvrobj](https://github.com/clvrobj)
-- [Chris Dzombak](https://github.com/cdzombak)
-- [concept47](https://github.com/concept47)
-- [seansay](https://github.com/seansay)
-- [Ian Langworth ☠](https://github.com/statico)
-- [Tamim Swaid](https://twitter.com/tamimat)
-- [Sean Leather](https://github.com/spl)
-- [Andrew Martin](https://github.com/sublimino)
-- [Krzysztof Kosyl](https://github.com/kosqx)
-- [Moritz U.](https://github.com/the-kenny)
+Build the extension:
+
+```bash
+$ gulp build
+```
+
+For testing, open the `chrome-extension://[Extension ID]/tests/tests.html` in the browser to check the test results.
+
+### [Contributors](https://github.com/clvrobj/Pinboard-Plus/graphs/contributors)

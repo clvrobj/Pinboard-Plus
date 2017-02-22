@@ -1,14 +1,18 @@
 {
   "name": "Pinboard Plus",
-  "version": "2.11",
+  "version": "2.11.0",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "browser_action": {
      "default_title": "Pinboard Plus",
-     "default_icon": "/img/icon_grey_19.png",
-     "default_popup": "/html/popup.html",
-     "icons": ["/img/icon_grey_19.png", "/img/icon_colored_19.png", "/img/icon_grey_saving_19.png"]
+     "default_icon": "images/icon_grey_19.png",
+     "default_popup": "popup.html",
+     "icons": [
+       "images/icon_grey_19.png",
+       "images/icon_colored_19.png",
+       "images/icon_grey_saving_19.png"
+     ]
   },
   "permissions": [
     "tabs",
@@ -16,20 +20,27 @@
     "https://*/*"
   ],
   "background": {
-    "page": "/html/background.html"
+    "scripts": [
+      "bower_components/jquery/dist/jquery.min.js",
+      "bower_components/underscore/underscore-min.js",
+      "scripts/common.js",
+      "scripts/utils.js",
+      "scripts/chromereload.js",
+      "scripts/background.js"
+    ]
   },
   "content_scripts": [{
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["/js/description.js"],
+      "js": ["scripts/description.js"],
       "all_frames": true
     }],
   "icons": {
-    "16": "/img/appicon_16.png",
-    "48": "/img/appicon_48.png",
-    "128": "/img/appicon_128.png"
+    "16": "images/appicon_16.png",
+    "48": "images/appicon_48.png",
+    "128": "images/appicon_128.png"
   },
-  "options_page": "/html/options.html",
+  "options_page": "options.html",
   "commands": {
      "_execute_browser_action": {
        "suggested_key": {
