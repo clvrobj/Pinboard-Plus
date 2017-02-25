@@ -23,6 +23,7 @@ Install dependencies:
 
 ```bash
 $ npm install
+$ bower install
 ```
 
 Follow the official instruction to [load the extenstion](https://developer.chrome.com/extensions/getstarted#unpacked).
