@@ -62,7 +62,7 @@ app.controller(
                    response.data.length !== 0) {
                  var desc = response.data;
                  if (desc.length > maxDescLen) {
-                   desc = desc.slice(0, maxDescLen) + '...'
+                   desc = desc.slice(0, maxDescLen) + '...';
                  }
                  if (isBlockquote()) {
                    desc = '<blockquote>' + desc + '</blockquote>';
@@ -89,7 +89,7 @@ app.controller(
            pageInfo = {url: tab.url, title: tab.title,
                        tag: '', desc: ''};
            pageInfo.shared = (localStorage[allprivateKey] !== 'true')
-                          && !((localStorage[privateWhenIncognitoKey] === 'true') && tab.incognito);
+             && !((localStorage[privateWhenIncognitoKey] === 'true') && tab.incognito);
            pageInfo.isPrivate = !pageInfo.shared;
            pageInfo.toread = (localStorage[alltoreadKey] === 'true');
            pageInfo.isSaved = false;
@@ -175,7 +175,8 @@ app.controller(
          word = word.toLowerCase();
          var allTags = $scope.allTags,
              shownCount = 0, autoCompleteItems = [];
-         for (var i=0, len=allTags.length; i<len && shownCount < MAX_SHOWN_ITEMS; i++) {
+         for (var i=0, len=allTags.length; i<len &&
+                  shownCount < MAX_SHOWN_ITEMS; i++) {
            var tag = allTags[i].toLowerCase();
            if (tag.indexOf(word) == 0) {
              var item = {text:tag, isActive: false};
