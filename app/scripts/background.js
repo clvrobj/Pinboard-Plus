@@ -1,52 +1,27 @@
 // {url: {title, desc, tag, time, isSaved, isSaving}}
-var pages = {}, _userInfo;
+var pages = {};
 
 var getPopup = function () {
   return chrome.extension.getViews({type: 'popup'})[0];
 };
 
-var makeBasicAuthHeader = function(user, password) {
-  var tok = user + ':' + password;
-  var hash = btoa(tok);
-  return 'Basic ' + hash;
-};
-
-var makeUserAuthHeader = function() {
-  var userInfo = getUserInfo();
-  return makeBasicAuthHeader(userInfo.name, userInfo.pwd);
-};
-
 var logout = function () {
-  _userInfo.isChecked = false;
-  localStorage.removeItem(checkedkey);
-  localStorage.removeItem(namekey);
-  localStorage.removeItem(pwdkey);
-  localStorage.removeItem(authTokenKey);
-  localStorage.removeItem(nopingKey);
-  var popup = getPopup();
-  popup && popup.$rootScope &&
-              popup.$rootScope.$broadcast('logged-out');
+  Pinboard.logout(function () {
+    var popup = getPopup();
+    popup && popup.$rootScope &&
+      popup.$rootScope.$broadcast('logged-out');
+  });
 };
 
 var getUserInfo = function () {
-  if (!_userInfo) {
-    if (localStorage[checkedkey]) {
-      _userInfo = {isChecked: localStorage[checkedkey],
-                   authToken: localStorage[authTokenKey],
-                   name: localStorage[namekey],
-                   pwd: localStorage[pwdkey]};
-    } else {
-      _userInfo = {isChecked: false, authToken: '',
-                   name: '', pwd: ''};
-    }
-  }
-  return _userInfo;
+  return Pinboard.getUserInfo();
 };
 
 // for popup.html to acquire page info
 // if there is no page info at local then get it from server
 var getPageInfo = function (url) {
-  if (!url || url.indexOf('chrome://') == 0 || localStorage[nopingKey] === 'true') {
+  if (!url || url.indexOf('chrome://') == 0 ||
+      localStorage[nopingKey] === 'true') {
     return {url: url, isSaved:false};
   }
   var pageInfo = pages[url];
@@ -84,52 +59,37 @@ var handleError = function (data) {
 };
 
 var login = function (token) {
-  // test auth
-  var path = mainPath + 'user/api_token',
-      jqxhr = $.ajax({url: path,
-                      data: {format:'json', auth_token: token},
-                      type : 'GET',
-                      timeout: REQ_TIME_OUT,
-                      dataType: 'json',
-                      crossDomain: true,
-                      contentType:'text/plain'
-      });
-  jqxhr.done(function (data) {
-    var popup = getPopup();
-    if (data.result) {
-      // success
-      _userInfo.authToken = token;
-      _userInfo.name = token.split(':')[0];
-      _userInfo.isChecked = true;
-      localStorage[namekey] = token.split(':')[0];
-      localStorage[authTokenKey] = token;
-      localStorage[checkedkey] = true;
-      popup && popup.$rootScope &&
-                                 popup.$rootScope.$broadcast('login-succeed');
-      _getTags();
-    } else {
-      // login error
+  Pinboard.login(
+    token,
+    function (data) {
       var popup = getPopup();
-      popup && popup.$rootScope &&
-                  popup.$rootScope.$broadcast('login-failed');
+      if (data.result) {
+        popup && popup.$rootScope &&
+          popup.$rootScope.$broadcast('login-succeed');
+        _getTags();
+      } else {
+        // login error
+        popup && popup.$rootScope &&
+          popup.$rootScope.$broadcast('login-failed');
+      }
+    },
+    function (data) {
+      var popup = getPopup();
+      if (data.status == 401 || data.status == 500) {
+        popup && popup.$rootScope &&
+          popup.$rootScope.$broadcast('login-failed');
+      } else {
+        handleError(data);
+      }
     }
-  });
-  jqxhr.fail(function (data) {
-    var popup = getPopup();
-    if (data.status == 401 || data.status == 500) {
-      popup && popup.$rootScope &&
-      popup.$rootScope.$broadcast('login-failed');
-    } else {
-      handleError(data);
-    }
-  });
+  );
 };
+
 
 var QUERY_INTERVAL = 3 * 1000, isQuerying = false, tQuery;
 var queryPinState = function (info) {
-  var userInfo = getUserInfo(),
-      url = info.url,
-      handler = function (data) {
+  var url = info.url,
+      done = function (data) {
         isQuerying = false;
         clearTimeout(tQuery);
         var posts = data.posts,
@@ -148,28 +108,15 @@ var queryPinState = function (info) {
         pages[url] = pageInfo;
         info.ready && info.ready(pageInfo);
       };
-  if ((info.isForce || !isQuerying) && userInfo && userInfo.isChecked &&
+  if ((info.isForce || !isQuerying) && Pinboard.isLoggedin() &&
       info.url && info.url != 'chrome://newtab/') {
     isQuerying = true;
     clearTimeout(tQuery);
     tQuery = setTimeout(function () {
+      // to make the queries less frequently
       isQuerying = false;
     }, QUERY_INTERVAL);
-    var settings = {url: mainPath + 'posts/get',
-                    type : 'GET',
-                    data: {url: url, format: 'json'},
-                    //timeout: REQ_TIME_OUT,
-                    dataType: 'json',
-                    crossDomain: true,
-                    contentType:'text/plain'};
-    if (userInfo.authToken) {
-      settings.data.auth_token = userInfo.authToken;
-    } else {
-      settings.headers = {'Authorization': makeUserAuthHeader()};
-    }
-    var jqxhr = $.ajax(settings);
-    jqxhr.done(handler);
-    jqxhr.fail(handleError);
+    Pinboard.queryPinState(url, done, handleError);
   }
 };
 
@@ -188,31 +135,12 @@ var updateSelectedTabExtIcon = function () {
 };
 
 var addPost = function (info) {
-  var userInfo = getUserInfo();
-  if (userInfo && userInfo.isChecked && info.url && info.title) {
+  if (Pinboard.isLoggedin && info.url && info.title) {
     var desc = info.desc;
     if (desc.length > maxDescLen) {
-      desc = desc.slice(0, maxDescLen) + '...'
+      desc = desc.slice(0, maxDescLen) + '...';
     }
-    var path = mainPath + 'posts/add',
-        data = {description: info.title, url: info.url,
-                extended: desc, tags: info.tag, format: 'json'};
-    info.shared && (data['shared'] = info.shared);
-    info.toread && (data['toread'] = info.toread);
-    var settings = {url: path,
-                    type : 'GET',
-                    timeout: REQ_TIME_OUT,
-                    dataType: 'json',
-                    crossDomain: true,
-                    data: data,
-                    contentType:'text/plain'};
-    if (userInfo.authToken) {
-      settings.data.auth_token = userInfo.authToken;
-    } else {
-      settings.headers = {'Authorization': makeUserAuthHeader()};
-    }
-    var jqxhr = $.ajax(settings);
-    jqxhr.done(function (data) {
+    var doneFn = function (data) {
       var resCode = data.result_code;
       if (pages[info.url]) {
         pages[info.url].isSaved = resCode == 'done' ? true : false;
@@ -223,14 +151,16 @@ var addPost = function (info) {
       queryPinState({url: info.url, isForce: true});
       var popup = getPopup();
       popup && popup.close();
-    });
-    jqxhr.fail(function (data) {
+    };
+    var failFn = function (data) {
       if (pages[info.url]) {
         pages[info.url].isSaved = false;
       } else {
         pages[info.url] = {isSaved: false};
       }
-    });
+    };
+    Pinboard.addPost(info.title, info.url, desc, info.tag,
+                     info.shared, info.toread, doneFn, failFn);
     // change icon state
     if (pages[info.url]) {
       pages[info.url].isSaving = true;
@@ -242,58 +172,27 @@ var addPost = function (info) {
 };
 
 var deletePost = function (url) {
-  var userInfo = getUserInfo();
-  if (userInfo && userInfo.isChecked && url) {
-    var path = mainPath + 'posts/delete';
-    var settings = {url: path,
-                    type : 'GET',
-                    timeout: REQ_TIME_OUT,
-                    dataType: 'json',
-                    crossDomain: true,
-                    data: {url: url, format: 'json'},
-                    contentType: 'text/plain'};
-    if (userInfo.authToken) {
-      settings.data.auth_token = userInfo.authToken;
-    } else {
-      settings.headers = {'Authorization': makeUserAuthHeader()};
-    }
-    var jqxhr = $.ajax(settings);
-    jqxhr.done(function (data) {
+  if (Pinboard.isLoggedin() && url) {
+    var doneFn = function (data) {
       var resCode = data.result_code;
+      var popup = getPopup();
       if (resCode == 'done' || resCode == 'item not found') {
         delete pages[url];
         updateSelectedTabExtIcon();
       } else {
         // error
-        var popup = getPopup();
         popup && popup.$rootScope &&
-                    popup.$rootScope.$broadcast('error');
+          popup.$rootScope.$broadcast('error');
       }
-      var popup = getPopup();
       popup && popup.close();
-    });
-    jqxhr.fail(handleError);
+    };
+    Pinboard.deletePost(url, doneFn, handleError);
   }
 };
 
 var getSuggest = function (url) {
-  var userInfo = getUserInfo();
-  if (userInfo && userInfo.isChecked && url) {
-    var path = mainPath + 'posts/suggest';
-    var settings = {url: path,
-                    type : 'GET',
-                    data: {url: url, format: 'json'},
-                    timeout: REQ_TIME_OUT,
-                    dataType: 'json',
-                    crossDomain: true,
-                    contentType:'text/plain'};
-    if (userInfo.authToken) {
-      settings.data.auth_token = userInfo.authToken;
-    } else {
-      settings.headers = {'Authorization': makeUserAuthHeader()};
-    }
-    var jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
+  if (Pinboard.isLoggedin() && url) {
+    var doneFn = function (data) {
       var popularTags = [], recommendedTags = [];
       if (data && data.length > 0) {
         popularTags = data[0].popular;
@@ -308,38 +207,25 @@ var getSuggest = function (url) {
       });
       var popup = getPopup();
       popup && popup.$rootScope &&
-                  popup.$rootScope.$broadcast('render-suggests', suggests);
-    });
+        popup.$rootScope.$broadcast('render-suggests', suggests);
+    };
+    Pinboard.getSuggest(url, doneFn);
   }
 };
 
-var _tags = [], _tagsWithCount = {};
+var _tags = [];
 // acquire all user tags from server refresh _tags
 var _getTags = function () {
-  var userInfo = getUserInfo();
-  if (userInfo && userInfo.isChecked) {
-    var path = mainPath + 'tags/get',
-        settings = {url: path,
-                    type : 'GET',
-                    data: {format: 'json'},
-                    timeout: REQ_TIME_OUT,
-                    dataType: 'json',
-                    crossDomain: true,
-                    contentType:'text/plain'};
-    if (userInfo.authToken) {
-      settings.data.auth_token = userInfo.authToken;
-    } else {
-      settings.headers = {'Authorization': makeUserAuthHeader()};
-    }
-    var jqxhr = $.ajax(settings);
-    jqxhr.always(function (data) {
+  if (Pinboard.isLoggedin()) {
+    var doneFn = function (data) {
       if (data) {
         _tags = _.sortBy(_.keys(data),
                          function (tag) {
                            return data[tag].count;
                          }).reverse();
       }
-    });
+    };
+    Pinboard.getTags(doneFn);
   }
 };
 _getTags();
@@ -347,10 +233,6 @@ _getTags();
 var getTags = function () {
   return _tags;
 };
-var getTagsWithCount = function () {
-  return _tagsWithCount;
-};
-
 
 // query at first time extension loaded
 chrome.tabs.getSelected(null, function (tab) {

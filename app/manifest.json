@@ -25,6 +25,7 @@
       "bower_components/underscore/underscore-min.js",
       "scripts/common.js",
       "scripts/utils.js",
+      "scripts/pinboard.js",
       "scripts/chromereload.js",
       "scripts/background.js"
     ]

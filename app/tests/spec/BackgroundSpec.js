@@ -11,17 +11,18 @@ describe("Test background", function() {
               title: "zhangchi",
               toread: false,
               url: "http://zhangchi.de/"}};
+    login('test_token');
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      "status": 200,
+      "contenttype": 'text/plain',
+      "responseText": JSON.stringify({result:'token'})
+    });
   });
 
   afterEach(function() {
+    logout();
     pages = {};
     jasmine.Ajax.uninstall();
-  });
-
-  it('log in should return', function () {
-    var token = 'test_token';
-    expect(login(token)).toBeUndefined();
-    expect(jasmine.Ajax.requests.mostRecent().url).toContain(mainPath + 'user/api_token');
   });
 
   it('user info in should return', function () {
