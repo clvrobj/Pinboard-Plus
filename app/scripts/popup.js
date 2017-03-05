@@ -1,9 +1,21 @@
-var app = angular.module('popupApp', []);
+var app = angular.module('popupApp', ['ngNotify']);
+
+app.run([
+  'ngNotify',
+  function(ngNotify) {
+    ngNotify.config({
+      position: 'bottom',
+      theme: 'notificationTheme',
+      html: true,
+      sticky: 'true'
+    });
+  }
+]);
 
 app.controller(
   'PopupCtrl',
-  ['$rootScope', '$scope', '$window',
-   function($rootScope, $scope, $window) {
+  ['$rootScope', '$scope', '$window', 'ngNotify',
+   function($rootScope, $scope, $window, ngNotify) {
      var bg = chrome.extension.getBackgroundPage(),
          keyCode = {enter:13, tab:9, up:38, down:40, ctrl:17, n:78, p:80, space:32},
          SEC = 1000, MIN = SEC*60, HOUR = MIN*60, DAY = HOUR*24, WEEK = DAY*7;
@@ -22,12 +34,6 @@ app.controller(
 
      $window.$rootScope = $rootScope;
 
-     $scope.$on('login-failed', function () {
-       $scope.isLoading = false;
-       $scope.isLoginError = true;
-       $scope.$apply();
-     });
-
      $scope.$on('login-succeed', function () {
        renderPageInfo();
      });
@@ -35,20 +41,12 @@ app.controller(
      $scope.$on('logged-out', function () {
        $scope.isAnony = true;
        $scope.isLoading = false;
-       $scope.isLoginError = false;
        $scope.$apply();
      });
 
      $scope.$on('show-loading', function (e, loadingText) {
        $scope.isLoading = true;
        $scope.loadingText = loadingText || 'Loading...';
-       $scope.$apply();
-     });
-
-     $scope.$on('error', function (e, errorText) {
-       $scope.isLoading = false;
-       $scope.isError = true;
-       $scope.errorText = errorText || 'Something wrong ...';
        $scope.$apply();
      });
 
@@ -287,16 +285,28 @@ app.controller(
        bg.logout();
      };
 
+     var showNotification = function () {
+       var noti = bg.getNotification();
+       if (noti) {
+         ngNotify.set(noti.message, {
+           html: true,
+           type: noti.type
+         }, bg.closeNotification);
+       }
+       $scope.isLoading = false;
+     };
+     $scope.$on('show-notification', showNotification);
+
      var userInfo = bg.getUserInfo();
      $scope.userInfo = userInfo;
      $scope.isAnony = !userInfo || !userInfo.isChecked;
      $scope.isLoading = false;
      $scope.loadingText = 'Loading...';
-     if ($scope.isAnony) {
-       $scope.isLoginError = false;
-     } else {
+     if (!$scope.isAnony) {
        renderPageInfo();
      }
+     ngNotify.addTheme('notificationTheme', 'notification-theme');
+     showNotification();
    }
   ]
 );

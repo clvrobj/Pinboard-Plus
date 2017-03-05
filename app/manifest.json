@@ -26,6 +26,7 @@
       "scripts/common.js",
       "scripts/utils.js",
       "scripts/pinboard.js",
+      "scripts/notifications.js",
       "scripts/chromereload.js",
       "scripts/background.js"
     ]

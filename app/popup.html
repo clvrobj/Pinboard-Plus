@@ -4,24 +4,20 @@
     <!-- bower:css angular-csp.css-->
     <link href="bower_components/angular/angular-csp.css" rel="stylesheet" type="text/css">
     <!-- endbower -->
+    <!-- bower:css ng-notify.min.css-->
+    <link href="bower_components/ng-notify/dist/ng-notify.min.css" rel="stylesheet" type="text/css">
+    <!-- endbower -->
     <link href="styles/popup.css" rel="stylesheet" type="text/css">
     <!-- endbuild -->
   </head>
   <body ng-controller="PopupCtrl">
     <div id="state-mask" ng-show="isLoading">{{loadingText}}</div>
-    <div id="error-info-bar" ng-show="isError">
-      <span>{{errorText}}</span>&nbsp;
-      <a href="#" title="Hide error info" ng-click="isError=false">x</a>
-    </div>
     <div id="login-window" ng-show="isAnony">
       <div id="header">
         <div class="logo-unlogin">Pinboard - please login</div>
       </div>
       <form id="login-form" ng-submit="loginSubmit()">
         <ul>
-          <li id="login-error" ng-show="isLoginError">
-            <span style="color:red;">Login Failed. The token format is user:TOKEN.</span>
-          </li>
           <li>
             <span style="width: 60px;display: inline-block;">API Token:</span>
             <input id="token" name="token" type="text" size="50" ng-model="userLogin.authToken" placeholder="API Token"/>
@@ -108,8 +104,10 @@
 
     <!-- build:js scripts/popup.js -->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
     <script type="text/javascript" src="bower_components/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="bower_components/ng-notify/dist/ng-notify.min.js"></script>
     <script type="text/javascript" src="scripts/common.js"></script>
     <script type="text/javascript" src="scripts/utils.js"></script>
     <script type="text/javascript" src="scripts/popup.js"></script>

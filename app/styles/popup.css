@@ -1,5 +1,5 @@
 html {
-    height: 320px;
+    height: 328px;
 }
 
 body {
@@ -167,4 +167,16 @@ ul .item-title {
 #blockquote-hint {
     color: #BEBEBE;
     margin: 2px 0 0;
+}
+
+.notification-theme {
+    font-size: inherit;
+    padding: 12px 80px;
+}
+
+.notification-theme .ngn-dismiss {
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
 }

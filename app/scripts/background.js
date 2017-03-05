@@ -1,4 +1,4 @@
-// {url: {title, desc, tag, time, isSaved, isSaving}}
+// {url: {title, desc, tag, time, isSaved[0: not saved; 1: saved; 2: saving]}}
 var pages = {};
 
 var getPopup = function () {
@@ -11,6 +11,7 @@ var logout = function () {
     popup && popup.$rootScope &&
       popup.$rootScope.$broadcast('logged-out');
   });
+  Notifications.clearAll();
 };
 
 var getUserInfo = function () {
@@ -37,25 +38,41 @@ var getPageInfo = function (url) {
 var updatePageInfo = function (url) {
   var popup = getPopup();
   popup && popup.$rootScope &&
-              popup.$rootScope.$broadcast('show-loading', 'Loading bookmark...');
+    popup.$rootScope.$broadcast('show-loading', 'Loading bookmark...');
   var cb = function (pageInfo) {
     var popup = getPopup();
     popup && popup.$rootScope &&
-                popup.$rootScope.$broadcast('render-page-info', pageInfo);
+      popup.$rootScope.$broadcast('render-page-info', pageInfo);
     updateSelectedTabExtIcon();
   };
   queryPinState({url: url, ready: cb});
 };
 
 var handleError = function (data) {
-  var popup = getPopup();
+  var message;
   if (data.status == 0 || data.statusText == 'error'){
-    popup && popup.$rootScope &&
-    popup.$rootScope.$broadcast('error', 'Error, please check your connection.');
+    message = 'Please check your connection.';
+  } else if (data.status == 401) {
+    message = 'Something wrong with the auth. Please try to login again.';
   } else {
-    popup && popup.$rootScope &&
-    popup.$rootScope.$broadcast('error', 'Error, Pinboard API is probably down.');
+    message = 'Pinboard API is probably down.';
   }
+  Notifications.add(message, 'error');
+};
+
+var addAndShowNotification = function (message, type) {
+  Notifications.add(message, type);
+  var popup = getPopup();
+  popup && popup.$rootScope &&
+    popup.$rootScope.$broadcast('show-notification');
+};
+
+var getNotification = function () {
+  return Notifications.getTop();
+};
+
+var closeNotification = function () {
+  Notifications.remove();
 };
 
 var login = function (token) {
@@ -69,15 +86,15 @@ var login = function (token) {
         _getTags();
       } else {
         // login error
-        popup && popup.$rootScope &&
-          popup.$rootScope.$broadcast('login-failed');
+        addAndShowNotification(
+          'Login Failed. The token format is user:TOKEN.', 'error');
       }
     },
     function (data) {
       var popup = getPopup();
       if (data.status == 401 || data.status == 500) {
-        popup && popup.$rootScope &&
-          popup.$rootScope.$broadcast('login-failed');
+        addAndShowNotification(
+          'Login Failed. The token format is user:TOKEN.', 'error');
       } else {
         handleError(data);
       }
@@ -124,9 +141,9 @@ var updateSelectedTabExtIcon = function () {
   chrome.tabs.getSelected(null, function (tab) {
     var pageInfo = pages[tab.url];
     var iconPath = noIcon;
-    if (pageInfo && pageInfo.isSaved) {
+    if (pageInfo && pageInfo.isSaved == 1) {
       iconPath = yesIcon;
-    } else if (pageInfo && pageInfo.isSaving) {
+    } else if (pageInfo && pageInfo.isSaved == 2) {
       iconPath = savingIcon;
     }
     chrome.browserAction.setIcon(
@@ -154,18 +171,36 @@ var addPost = function (info) {
     };
     var failFn = function (data) {
       if (pages[info.url]) {
-        pages[info.url].isSaved = false;
+        pages[info.url].isSaved = 0;
       } else {
-        pages[info.url] = {isSaved: false};
+        pages[info.url] = {isSaved: 0};
       }
+      updateSelectedTabExtIcon();
+      var saveFailedMsg, failReason;
+      if (info.title.length > 47) {
+        var title = info.title.slice(0, 47) + '...';
+        saveFailedMsg = 'The post <b>' + title + '</b> is not saved. ';
+      } else {
+        saveFailedMsg = 'The post <b>' + info.title + '</b> is not saved. ';
+      }
+      if (data.status == 0 || data.statusText == 'error'){
+        failReason = 'Please check your connection.';
+      } else if (data.status == 401) {
+        failReason = 'Something wrong with the auth. Please try to login again.';
+      } else {
+        failReason = 'Pinboard API is probably down.';
+      }
+      var message = saveFailedMsg + failReason;
+      // only store error and no need to show as popup is close
+      Notifications.add(message, 'error');
     };
     Pinboard.addPost(info.title, info.url, desc, info.tag,
                      info.shared, info.toread, doneFn, failFn);
     // change icon state
     if (pages[info.url]) {
-      pages[info.url].isSaving = true;
+      pages[info.url].isSaved = 2;
     } else {
-      pages[info.url] = {isSaving: true};
+      pages[info.url] = {isSaved: 2};
     }
     updateSelectedTabExtIcon();
   }
@@ -231,8 +266,13 @@ var _getTags = function () {
 _getTags();
 
 var getTags = function () {
+  if (!_tags || _tags.length === 0) {
+    _getTags();
+  }
   return _tags;
 };
+
+Notifications.init();
 
 // query at first time extension loaded
 chrome.tabs.getSelected(null, function (tab) {
@@ -270,7 +310,8 @@ chrome.tabs.onUpdated.addListener(
     if (pages[url] && pages[url].isSaved) {
       chrome.browserAction.setIcon({path: yesIcon, tabId: tab.id});
     }
-  });
+  }
+);
 
 chrome.tabs.onSelectionChanged.addListener(
   function(tabId, selectInfo) {
@@ -290,4 +331,5 @@ chrome.tabs.onSelectionChanged.addListener(
                          }});
         }
       });
-  });
+  }
+);
