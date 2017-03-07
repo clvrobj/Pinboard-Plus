@@ -53,8 +53,9 @@ gulp.task('html',  () => {
              .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
              .pipe($.sourcemaps.init())
              .pipe($.if('*.js', $.uglify()))
+             .pipe($.if('*.js', $.sourcemaps.write('.')))
              .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
-             .pipe($.sourcemaps.write())
+             .pipe($.if('*.css', $.sourcemaps.write('.')))
              .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
              .pipe(gulp.dest('dist'));
 });
@@ -109,7 +110,7 @@ gulp.task('wiredep', () => {
 
 gulp.task('package', function () {
   var manifest = require('./dist/manifest.json');
-  return gulp.src('dist/**')
+  return gulp.src(['dist/**', '!**/*.map'])
              .pipe($.zip('Pinboard-Plus-' + manifest.version + '.zip'))
              .pipe(gulp.dest('package'));
 });
