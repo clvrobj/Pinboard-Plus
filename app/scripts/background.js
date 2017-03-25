@@ -50,12 +50,12 @@ var updatePageInfo = function (url) {
 
 var handleError = function (data) {
   var message;
-  if (data.status == 0 || data.statusText == 'error'){
-    message = 'Please check your connection.';
+  if (data.status == 0 || data.status == 500){
+    message = 'Please check your connection or Pinboard API is probably down.';
   } else if (data.status == 401) {
     message = 'Something wrong with the auth. Please try to login again.';
   } else {
-    message = 'Pinboard API is probably down.';
+    message = data.statusText || 'Something wrong';
   }
   Notifications.add(message, 'error');
 };
@@ -133,7 +133,9 @@ var queryPinState = function (info) {
       // to make the queries less frequently
       isQuerying = false;
     }, QUERY_INTERVAL);
-    Pinboard.queryPinState(url, done, handleError);
+    // The queryPinState is high frequently called
+    // but without risk of lost of user data, it's OK to ignore error use noop
+    Pinboard.queryPinState(url, done, $.noop);
   }
 };
 
@@ -183,12 +185,13 @@ var addPost = function (info) {
       } else {
         saveFailedMsg = 'The post <b>' + info.title + '</b> is not saved. ';
       }
-      if (data.status == 0 || data.statusText == 'error'){
-        failReason = 'Please check your connection.';
+      if (data.status == 0 || data.status == 500){
+        failReason = 'Please check your connection or Pinboard' +
+                     ' API is probably down.';
       } else if (data.status == 401) {
         failReason = 'Something wrong with the auth. Please try to login again.';
       } else {
-        failReason = 'Pinboard API is probably down.';
+        failReason = data.statusText || 'Something wrong.';
       }
       var message = saveFailedMsg + failReason;
       // only store error and no need to show as popup is close
