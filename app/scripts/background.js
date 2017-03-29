@@ -52,12 +52,14 @@ var handleError = function (data) {
   var message;
   if (data.status == 0 || data.status == 500){
     message = 'Please check your connection or Pinboard API is probably down.';
+  } if (data.status == 200 && data.responseText.includes('Pinboard is Down')) {
+    message = 'Pinboard API is down.';
   } else if (data.status == 401) {
     message = 'Something wrong with the auth. Please try to login again.';
   } else {
     message = data.statusText || 'Something wrong';
   }
-  Notifications.add(message, 'error');
+  addAndShowNotification(message, 'error');
 };
 
 var addAndShowNotification = function (message, type) {
@@ -188,6 +190,8 @@ var addPost = function (info) {
       if (data.status == 0 || data.status == 500){
         failReason = 'Please check your connection or Pinboard' +
                      ' API is probably down.';
+      } if (data.status == 200 && data.responseText.includes('Pinboard is Down')) {
+        failReason = 'Pinboard API is down.';
       } else if (data.status == 401) {
         failReason = 'Something wrong with the auth. Please try to login again.';
       } else {
