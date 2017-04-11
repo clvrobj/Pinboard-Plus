@@ -1,4 +1,4 @@
-Pinboard Plus
+Pinboard Plus [![Build Status](https://travis-ci.org/clvrobj/Pinboard-Plus.svg?branch=master)](https://travis-ci.org/clvrobj/Pinboard-Plus)
 =============
 Pinboard Plus is a better Chrome extension for [Pinboard.in](http://pinboard.in). 
 
