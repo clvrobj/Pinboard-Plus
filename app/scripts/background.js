@@ -210,6 +210,10 @@ var addPost = function (info) {
       pages[info.url] = {isSaved: 2};
     }
     updateSelectedTabExtIcon();
+    // add new tags into _tags
+    if (info.tag) {
+      _updateTags(info.tag.split(' '));
+    }
   }
 };
 
@@ -271,6 +275,14 @@ var _getTags = function () {
   }
 };
 _getTags();
+
+// add new tags into _tags
+var _updateTags = function (tags) {
+  var newTags = _.difference(tags, _tags);
+  if (newTags.length > 0) {
+    _tags.push.apply(_tags, newTags)
+  }
+};
 
 var getTags = function () {
   if (!_tags || _tags.length === 0) {

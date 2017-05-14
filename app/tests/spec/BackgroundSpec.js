@@ -38,7 +38,7 @@ describe("Test background", function() {
     expect(jasmine.Ajax.requests.mostRecent().url).toContain(mainPath + 'posts/get');
   });
 
-  it('add should be good', function () {
+  it('add post should be good', function () {
     var pageInfo = {url: 'http://twitter.com',
                     title: 'Twitter',
                     desc: '',
@@ -46,6 +46,18 @@ describe("Test background", function() {
                     toread: false};
     expect(addPost(pageInfo)).toBeUndefined();
     expect(jasmine.Ajax.requests.mostRecent().url).toContain(mainPath + 'posts/add');
+  });
+
+  it('new tags should be add to the tags list', function () {
+    _tags = ['pinboard', 'plus'];
+    var pageInfo = {url: 'http://pinboard-plus.zhangchi.de/',
+                    title: 'Pinboard Plus',
+                    desc: '',
+                    tag: 'pinboard plus pinboardplus',
+                    shared: true,
+                    toread: false};
+    expect(addPost(pageInfo)).toBeUndefined();
+    expect(_tags).toEqual(['pinboard', 'plus'].concat(['pinboardplus']));
   });
 
   it('delete should be good', function () {
