@@ -171,10 +171,13 @@ app.controller(
            MAX_SHOWN_ITEMS = 5;
        if (word) {
          word = word.toLowerCase();
+         if (typeof $scope.allTags === 'undefined') {
+           initAutoComplete();
+         }
          var allTags = $scope.allTags,
              shownCount = 0, autoCompleteItems = [];
          for (var i=0, len=allTags.length; i<len &&
-                  shownCount < MAX_SHOWN_ITEMS; i++) {
+                           shownCount < MAX_SHOWN_ITEMS; i++) {
            var tag = allTags[i].toLowerCase();
            if (tag.indexOf(word) == 0) {
              var item = {text:tag, isActive: false};
