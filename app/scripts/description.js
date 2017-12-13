@@ -1,6 +1,6 @@
-chrome.extension.onRequest.addListener(
-  function(request, sender, sendResponse) {
-    if (request.method == 'getDescription') {
+browser.runtime.onMessage.addListener(
+  function(message, sender, sendResponse) {
+    if (message.method == 'getDescription') {
       var description = window.getSelection().toString();
       if (!description || description == '') {
         var metas = document.getElementsByTagName('meta');
