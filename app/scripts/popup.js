@@ -51,8 +51,9 @@ app.controller(
      });
 
      var copySelOrMetaToDesc = function () {
-       chrome.tabs.getSelected(
-         null, function(tab) {
+       chrome.tabs.query(
+         {active:true, currentWindow: true}, function (activetabs) {
+           var tab = activetabs[0];
            chrome.tabs.sendMessage(
              tab.id, {method: 'getDescription'},
              function (response) {
@@ -81,7 +82,8 @@ app.controller(
      };
 
      var renderPageInfo = function () {
-       chrome.tabs.getSelected(null, function (tab) {
+       chrome.tabs.query({active:true, currentWindow: true}, function (activetabs) {
+         var tab = activetabs[0];
          var pageInfo = bg.getPageInfo(tab.url);
          if (!pageInfo || pageInfo.isSaved == false) {
            pageInfo = {url: tab.url, title: tab.title,
@@ -270,8 +272,9 @@ app.controller(
 
      $scope.postDelete = function () {
        $scope.loadingText = 'Deleting...';
-       chrome.tabs.getSelected(
-         null, function (tab) {
+       chrome.tabs.query(
+         {active:true, currentWindow: true}, function (activetabs) {
+           var tab = activetabs[0];
            bg.deletePost(tab.url);
          });
      };
