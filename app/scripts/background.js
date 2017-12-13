@@ -334,7 +334,7 @@ chrome.tabs.onUpdated.addListener(
   }
 );
 
-chrome.tabs.onSelectionChanged.addListener(
+chrome.tabs.onActivated.addListener(
   function(tabId, selectInfo) {
     if (localStorage[nopingKey] === 'true') {
       return;
