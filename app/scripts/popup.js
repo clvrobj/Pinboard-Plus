@@ -53,7 +53,7 @@ app.controller(
      var copySelOrMetaToDesc = function () {
        chrome.tabs.getSelected(
          null, function(tab) {
-           chrome.tabs.sendRequest(
+           chrome.tabs.sendMessage(
              tab.id, {method: 'getDescription'},
              function (response) {
                if (typeof response !== 'undefined' &&
