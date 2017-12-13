@@ -1,4 +1,4 @@
-browser.runtime.onMessage.addListener(
+chrome.runtime.onMessage.addListener(
   function(message, sender, sendResponse) {
     if (message.method == 'getDescription') {
       var description = window.getSelection().toString();
