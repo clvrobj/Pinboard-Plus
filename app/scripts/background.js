@@ -142,7 +142,8 @@ var queryPinState = function (info) {
 };
 
 var updateSelectedTabExtIcon = function () {
-  chrome.tabs.getSelected(null, function (tab) {
+  chrome.tabs.query({active:true, currentWindow: true}, function (activetabs) {
+    var tab = activetabs[0];
     var pageInfo = pages[tab.url];
     var iconPath = noIcon;
     if (pageInfo && pageInfo.isSaved == 1) {
@@ -294,7 +295,8 @@ var getTags = function () {
 Notifications.init();
 
 // query at first time extension loaded
-chrome.tabs.getSelected(null, function (tab) {
+chrome.tabs.query({active:true, currentWindow: true}, function (activetabs) {
+  var tab = activetabs[0];
   if (localStorage[nopingKey] === 'true') {
     return;
   }
@@ -332,13 +334,14 @@ chrome.tabs.onUpdated.addListener(
   }
 );
 
-chrome.tabs.onSelectionChanged.addListener(
+chrome.tabs.onActivated.addListener(
   function(tabId, selectInfo) {
     if (localStorage[nopingKey] === 'true') {
       return;
     }
-    chrome.tabs.getSelected(
-      null, function (tab) {
+    chrome.tabs.query(
+      {active:true, currentWindow: true}, function (activetabs) {
+        var tab = activetabs[0];
         var url = tab.url;
         if (!pages.hasOwnProperty(url)) {
           queryPinState({url: url,
