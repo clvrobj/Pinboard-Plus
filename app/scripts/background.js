@@ -158,35 +158,35 @@ var updateSelectedTabExtIcon = function () {
 
 var addPost = function (info) {
   if (Pinboard.isLoggedin && info.url && info.title) {
-    var desc = info.desc;
+    var url = info.url, title = info.title, desc = info.desc;
     if (desc.length > maxDescLen) {
       desc = desc.slice(0, maxDescLen) + '...';
     }
     var doneFn = function (data) {
       var resCode = data.result_code;
-      if (pages[info.url]) {
-        pages[info.url].isSaved = resCode == 'done' ? true : false;
+      if (pages[url]) {
+        pages[url].isSaved = resCode == 'done' ? true : false;
       } else {
-        pages[info.url] = {isSaved: resCode == 'done' ? true : false};
+        pages[url] = {isSaved: resCode == 'done' ? true : false};
       }
       updateSelectedTabExtIcon();
-      queryPinState({url: info.url, isForce: true});
+      queryPinState({url: url, isForce: true});
       var popup = getPopup();
       popup && popup.close();
     };
     var failFn = function (data) {
-      if (pages[info.url]) {
-        pages[info.url].isSaved = 0;
+      if (pages[url]) {
+        pages[url].isSaved = 0;
       } else {
-        pages[info.url] = {isSaved: 0};
+        pages[url] = {isSaved: 0};
       }
       updateSelectedTabExtIcon();
       var saveFailedMsg, failReason;
-      if (info.title.length > 47) {
-        var title = info.title.slice(0, 47) + '...';
-        saveFailedMsg = 'The post <b>' + title + '</b> is not saved. ';
+      if (title.length > 47) {
+        var _title = title.slice(0, 47) + '...';
+        saveFailedMsg = 'The post <b>' + _title + '</b> is not saved. ';
       } else {
-        saveFailedMsg = 'The post <b>' + info.title + '</b> is not saved. ';
+        saveFailedMsg = 'The post <b>' + title + '</b> is not saved. ';
       }
       if (data.status == 0 || data.status == 500){
         failReason = 'Please check your connection or Pinboard' +
