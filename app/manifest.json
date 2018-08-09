@@ -1,6 +1,6 @@
 {
   "name": "Pinboard Plus",
-  "version": "2.12",
+  "version": "2.12.1",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self'; object-src 'self'",
@@ -38,7 +38,8 @@
     "128": "images/appicon_128.png"
   },
   "options_ui": {
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": false
   },
   "commands": {
      "_execute_browser_action": {
