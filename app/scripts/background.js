@@ -237,7 +237,7 @@ var deletePost = function (url) {
   }
 };
 
-var getSuggest = function (url) {
+var getSuggest = function (url, keywordTags) {
   if (Pinboard.isLoggedin() && url) {
     var doneFn = function (data) {
       var popularTags = [], recommendedTags = [];
@@ -252,6 +252,15 @@ var getSuggest = function (url) {
           suggests.push(tag);
         }
       });
+
+      console.log("PRE Suggested Tags: " + keywordTags);
+
+	  if (keywordTags !== undefined && keywordTags.length !== 0) {
+        suggests = suggests.concat(keywordTags);
+        console.log("Post Suggested Tags: " + suggests);
+		suggests = suggests.sort().filter(function(item, pos, ary) {return !pos || item != ary[pos -  1];});
+      }
+
       var popup = getPopup();
       popup && popup.$rootScope &&
         popup.$rootScope.$broadcast('render-suggests', suggests);

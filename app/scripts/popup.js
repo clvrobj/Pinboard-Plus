@@ -74,6 +74,24 @@ app.controller(
          });
      };
 
+     var getKeywordsSuggestionTags = function () {
+       chrome.tabs.query(
+         {active:true, currentWindow: true}, function (activetabs) {
+           var tab = activetabs[0];
+           chrome.tabs.sendMessage(
+             tab.id, {method: 'getKeywordsSuggestionTags'},
+             function (response) {
+               if (typeof response !== 'undefined') {
+                 var tags = response.data;
+                 bg.getSuggest(tab.url, tags);
+               }
+               else {
+                 bg.getSuggest(tab.url);
+               }
+             });
+         });
+     };
+
      var initAutoComplete = function () {
        var tags = bg.getTags();
        if (tags && tags.length) {
@@ -105,7 +123,8 @@ app.controller(
          $scope.isLoading = false;
          $scope.isAnony = false;
          $scope.$apply();
-         bg.getSuggest(tab.url);
+         //bg.getSuggest(tab.url);
+         getKeywordsSuggestionTags();
          initAutoComplete();
          if (location.search != '?focusHack') {
            location.search = '?focusHack';
