@@ -253,8 +253,6 @@ var getSuggest = function (url, keywordTags) {
         }
       });
 
-      console.log("PRE Suggested Tags: " + keywordTags);
-
 	  if (keywordTags !== undefined && keywordTags.length !== 0) {
         suggests = suggests.concat(keywordTags);
         console.log("Post Suggested Tags: " + suggests);
