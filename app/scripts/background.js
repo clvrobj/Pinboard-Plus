@@ -255,7 +255,6 @@ var getSuggest = function (url, keywordTags) {
 
 	  if (keywordTags !== undefined && keywordTags.length !== 0) {
         suggests = suggests.concat(keywordTags);
-        console.log("Post Suggested Tags: " + suggests);
 		suggests = suggests.sort().filter(function(item, pos, ary) {return !pos || item != ary[pos -  1];});
       }
 
