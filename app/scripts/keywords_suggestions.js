@@ -6,7 +6,6 @@ chrome.runtime.onMessage.addListener(
 		  if (metas[i].getAttribute("name") === "keywords") {
 			var tags = metas[i].getAttribute("content").toLowerCase().replace(/,/g, ' ').replace(/;/, '').split(/(\s+)/).filter(function(e) { return e.trim().length > 0; }).sort().filter(function(item, pos, ary) {return !pos || item != ary[pos - 1];});
 			break
-            console.log("Tags: " + tags);
 		  }
 		}
         sendResponse({data: tags});
