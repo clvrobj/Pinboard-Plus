@@ -253,14 +253,13 @@ var getSuggest = function (url, keywordTags) {
         }
       });
 
-	  if (keywordTags !== undefined && keywordTags.length !== 0) {
+      if (keywordTags !== undefined && keywordTags.length !== 0) {
         suggests = suggests.concat(keywordTags);
-		suggests = suggests.sort().filter(function(item, pos, ary) {return !pos || item != ary[pos -  1];});
+        suggests = suggests.sort().filter(function(item, pos, ary) {return !pos || item != ary[pos -  1];});
       }
 
       var popup = getPopup();
-      popup && popup.$rootScope &&
-        popup.$rootScope.$broadcast('render-suggests', suggests);
+      popup && popup.$rootScope && popup.$rootScope.$broadcast('render-suggests', suggests);
     };
     Pinboard.getSuggest(url, doneFn);
   }
