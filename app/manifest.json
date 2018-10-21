@@ -29,7 +29,7 @@
   "content_scripts": [{
       "matches": ["http://*/*", "https://*/*"],
       "run_at": "document_start",
-      "js": ["scripts/description.js"],
+      "js": ["scripts/description.js", "scripts/keywords_suggestions.js"],
       "all_frames": true
     }],
   "icons": {
