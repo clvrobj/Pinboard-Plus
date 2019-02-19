@@ -189,7 +189,7 @@ app.controller(
      $scope.showAutoComplete = function () {
        var items = $scope.pageInfo.tag.split(' '),
            word = items[items.length - 1],
-           MAX_SHOWN_ITEMS = 5;
+           MAX_SHOWN_ITEMS = 7;
        if (word) {
          word = word.toLowerCase();
          if (typeof $scope.allTags === 'undefined') {
