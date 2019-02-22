@@ -19,6 +19,11 @@ You can install in Chrome webstore: [Pinboard Plus](https://chrome.google.com/we
 
 Development
 -----------
+Software required for development:
+
+* [bower](https://bower.io/)
+* [npm](https://www.npmjs.com/)
+
 Install dependencies:
 
 ```bash
