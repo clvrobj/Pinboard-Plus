@@ -198,10 +198,11 @@ app.controller(
          var allTags = $scope.allTags,
              shownCount = 0, autoCompleteItems = [];
          for (var i=0, len=allTags.length; i<len &&
-                           shownCount < MAX_SHOWN_ITEMS; i++) {
+                  shownCount < MAX_SHOWN_ITEMS; i++) {
+           // Filter with the lower cases, show the tag in original case
            var tag = allTags[i].toLowerCase();
            if (tag.indexOf(word) == 0) {
-             var item = {text:tag, isActive: false};
+             var item = {text:allTags[i], isActive: false};
              autoCompleteItems.push(item);
              shownCount += 1;
            }
