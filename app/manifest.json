@@ -6,7 +6,7 @@
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "browser_action": {
      "default_title": "Pinboard Plus",
-     "default_icon": "images/icon_grey_19.png",
+     "default_icon": "images/icon_black_16.png",
      "default_popup": "popup.html"
   },
   "permissions": [

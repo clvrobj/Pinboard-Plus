@@ -17,8 +17,8 @@ privateWhenIncognitoKey = keyPrefix + 'privatewhenincognito',
 
 mainPath = 'https://api.pinboard.in/v1/',
 
-yesIcon = 'images/icon_colored_19.png',
-noIcon = 'images/icon_grey_19.png',
+yesIcon = 'images/icon_color_16.png',
+noIcon = 'images/icon_black_16.png',
 savingIcon = 'images/icon_grey_saving_19.png';
 
 var REQ_TIME_OUT = 125 * 1000, maxDescLen = 500;
