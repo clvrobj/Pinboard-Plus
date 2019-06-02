@@ -1,6 +1,6 @@
 {
   "name": "Pinboard Plus",
-  "version": "2.12.2",
+  "version": "2.12.4",
   "description": "A better extension for Pinboard (http://pinboard.in). Easy to know current page has been saved or not.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self'; object-src 'self'",
