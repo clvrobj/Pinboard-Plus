@@ -1,7 +1,6 @@
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
-import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
 const $ = gulpLoadPlugins();
@@ -76,20 +75,20 @@ gulp.task('chromeManifest', () => {
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('watch', ['lint'], () => {
+gulp.task('watch', gulp.series('lint'), () => {
   $.livereload.listen();
 
   gulp.watch([
-    'app/*.html',
-    'app/scripts/**/*.js',
-    'app/images/**/*',
-    'app/styles/**/*',
-    'app/_locales/**/*.json',
-    'app/tests/**/*.js'
+    'app.html',
+    'app/scripts.js',
+    'app/images',
+    'app/styles',
+    'app/_locales.json',
+    'app/tests.js'
   ]).on('change', $.livereload.reload);
 
-  gulp.watch('app/scripts/**/*.js', ['lint']);
-  gulp.watch('bower.json', ['wiredep']);
+  gulp.watch('app/scripts.js', gulp.series('lint'));
+  gulp.watch('bower.json', gulp.series('wiredep'));
 });
 
 gulp.task('size', () => {
@@ -112,12 +111,14 @@ gulp.task('package', function () {
 });
 
 gulp.task('build', (cb) => {
-  runSequence(
+  gulp.series(
     'lint', 'chromeManifest',
-    ['html', 'images', 'extras'],
-    'size', cb);
+    gulp.parallel('html', 'images', 'extras'),
+    'size');
+  cb();
 });
 
-gulp.task('default', ['clean'], cb => {
-  runSequence('build', cb);
+gulp.task('default', gulp.series('clean'), cb => {
+  gulp.series('build');
+  cb();
 });
