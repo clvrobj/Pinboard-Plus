@@ -9,10 +9,11 @@
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-preset-es2015": "^6.6.0",
+    "babel-register": "^6.26.0",
     "del": "^2.2.0",
     "gulp": "^4.0.0",
     "gulp-cache": "^0.4.3",
-    "gulp-chrome-manifest": "^0.0.2",
+    "gulp-chrome-manifest": "^0.0.13",
     "gulp-clean-css": "^2.0.3",
     "gulp-eslint": "^2.0.0",
     "gulp-htmlmin": "^5.0.1",
@@ -26,7 +27,6 @@
     "gulp-useref": "^3.0.8",
     "gulp-zip": "^3.2.0",
     "main-bower-files": "^2.11.1",
-    "run-sequence": "^1.1.5",
     "wiredep": "^4.0.0"
   },
   "eslintConfig": {
@@ -44,8 +44,5 @@
         "single"
       ]
     }
-  },
-  "dependencies": {
-    "babel-register": "^6.26.0"
   }
 }
