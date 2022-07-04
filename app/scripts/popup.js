@@ -113,7 +113,7 @@ app.controller(
            pageInfo.isSaved = false;
          }
          if (pageInfo.tag) {
-           pageInfo.tag = pageInfo.tag.concat(' ');
+           pageInfo.tag = pageInfo.tag.trim();
          }
          pageInfo.isPrivate = !pageInfo.shared;
          $scope.pageInfo = _.clone(pageInfo); // do not deep copy
